@@ -1,0 +1,19 @@
+{
+  "name": "classapp_carlos-eduardo",
+  "version": "1.0.0",
+  "description": "Dev Challenge to test my skills",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "humanolaranja"
+  },
+  "author": "Carlos Eduardo da Silva Santos (Humano Laranja)",
+  "license": "ISC",
+  "dependencies": {
+    "csv": "^3.1.0",
+    "google-libphonenumber": "^3.1.6"
+  }
+}
