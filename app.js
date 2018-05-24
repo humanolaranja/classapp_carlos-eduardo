@@ -98,6 +98,93 @@ function fillData(resultarray, base) {
         final[place]["classes"].push(temp[i]);
       }
 
+      //filter the address (email)
+      var emails = resultarray[i][4].split('/'); // separate emails if has /
+      if(emails.length > 1) {
+        for (let i = 0; i < emails.length; i++) {
+          if(validateEmail(emails[i])) {
+            var newobject = new Object(); // create new object
+            newobject = JSON.parse(JSON.stringify(newline["addresses"][0])); // use this object but not with reference
+            newobject.address = emails[i]; // put the address
+            final[place]["addresses"].push(newobject); // put into addresses
+          }
+        }
+      }
+      else {
+        if(validateEmail(resultarray[i][4])) { // if is an valid email
+          var newobject = new Object(); // create new object
+          newobject = JSON.parse(JSON.stringify(newline["addresses"][0])); // use this object but not with reference
+          newobject.address = resultarray[i][4]; // put the address
+          final[place]["addresses"].push(newobject); // put into addresses
+        }
+      }
+
+      //put the address (phone)
+      if(filterTel(resultarray[i][5])) { // if is an valid tel
+        var newobject = new Object(); // create new object
+        newobject = JSON.parse(JSON.stringify(newline["addresses"][1])); // use this object but not with reference
+        newobject.address = filterTel(resultarray[i][5]); // put the address
+        final[place]["addresses"].push(newobject); // put into addresses
+      }
+
+      //put the address (phone)
+      if(filterTel(resultarray[i][6])) { // if is an valid tel
+        var newobject = new Object(); // create new object
+        newobject = JSON.parse(JSON.stringify(newline["addresses"][2])); // use this object but not with reference
+        newobject.address = filterTel(resultarray[i][6]); // put the address
+        final[place]["addresses"].push(newobject); // put into addresses
+      }
+
+      //filter the address (email)
+      var emails = resultarray[i][7].split('/'); // separate emails if has /
+      if(emails.length > 1) {
+        for (let i = 0; i < emails.length; i++) {
+          if(validateEmail(emails[i])) {
+            var newobject = new Object(); // create new object
+            newobject = JSON.parse(JSON.stringify(newline["addresses"][3])); // use this object but not with reference
+            newobject.address = emails[i]; // put the address
+            final[place]["addresses"].push(newobject); // put into addresses
+          }
+        }
+      }
+      else {
+        if(validateEmail(resultarray[i][7])) { // if is an valid email
+          var newobject = new Object(); // create new object
+          newobject = JSON.parse(JSON.stringify(newline["addresses"][3])); // use this object but not with reference
+          newobject.address = resultarray[i][7]; // put the address
+          final[place]["addresses"].push(newobject); // put into addresses
+        }
+      }
+
+      //filter the address (email)
+      var emails = resultarray[i][8].split('/'); // separate emails if has /
+      if(emails.length > 1) {
+        for (let i = 0; i < emails.length; i++) {
+          if(validateEmail(emails[i])) {
+            var newobject = new Object(); // create new object
+            newobject = JSON.parse(JSON.stringify(newline["addresses"][4])); // use this object but not with reference
+            newobject.address = emails[i]; // put the address
+            final[place]["addresses"].push(newobject); // put into addresses
+          }
+        }
+      }
+      else {
+        if(validateEmail(resultarray[i][8])) { // if is an valid email
+          var newobject = new Object(); // create new object
+          newobject = JSON.parse(JSON.stringify(newline["addresses"][4])); // use this object but not with reference
+          newobject.address = resultarray[i][8]; // put the address
+          final[place]["addresses"].push(newobject); // put into addresses
+        }
+      }
+
+      //put the address (phone)
+      if(filterTel(resultarray[i][9])) { // if is an valid tel
+        var newobject = new Object(); // create new object
+        newobject = JSON.parse(JSON.stringify(newline["addresses"][5])); // use this object but not with reference
+        newobject.address = filterTel(resultarray[i][9]); // put the address
+        final[place]["addresses"].push(newobject); // put into addresses
+      }
+
       //put the invisible
       if((final[place]["invisible"] == false) && (resultarray[i][10] == '1' || resultarray[i][10] == 'yes' || resultarray[i][10] == true)) {
         final[place]["invisible"]   = true // put the invisible into array
@@ -125,18 +212,7 @@ function fillData(resultarray, base) {
 
       //filter the address (email)
       if(validateEmail(resultarray[i][4])) { // if is an valid email
-        var array = resultarray[i][4].split('/'); // separate emails if has /
-        if(array.length > 1) { // if has more then one email
-          for(let j = 0; j < array.length; j++) {
-            var newobject = newline["addresses"][0];  // copy the base
-            var whereto   = (newline["addresses"].length); // set where this data will be in the array
-            newline["addresses"].push(newobject); // put the base
-            newline["addresses"][whereto].address = array[j]; // fill the new base with content
-          }
-        }
-        else {
-          newline["addresses"][0].address = resultarray[i][4]; // // put the address into array
-        }
+        newline["addresses"][0].address = resultarray[i][4]; // // put the address into array
       }
       else {
         newline["addresses"][0].address = ''; // set address as null
@@ -163,18 +239,7 @@ function fillData(resultarray, base) {
 
       //filter the address (email)
       if(validateEmail(resultarray[i][7])) { // if is an valid email
-        var array = resultarray[i][7].split('/'); // separate emails if has /
-        if(array.length > 1) { // if has more then one email
-          for(let j = 0; j < array.length; j++) {
-            var newobject = newline["addresses"][3];  // copy the base
-            var whereto   = (newline["addresses"].length); // set where this data will be in the array
-            newline["addresses"].push(newobject); // put the base
-            newline["addresses"][whereto].address = array[j]; // fill the new base with content
-          }
-        }
-        else {
-          newline["addresses"][3].address = resultarray[i][7]; // // put the address into array
-        }
+        newline["addresses"][3].address = resultarray[i][7]; // // put the address into array
       }
       else {
         newline["addresses"][3].address = ''; // set address as null
@@ -183,18 +248,7 @@ function fillData(resultarray, base) {
 
       //filter the address (email)
       if(validateEmail(resultarray[i][8])) { // if is an valid email
-        var array = resultarray[i][8].split('/'); // separate emails if has /
-        if(array.length > 1) { // if has more then one email
-          for(let j = 0; j < array.length; j++) {
-            var newobject = newline["addresses"][4];  // copy the base
-            var whereto   = (newline["addresses"].length); // set where this data will be in the array
-            newline["addresses"].push(newobject); // put the base
-            newline["addresses"][whereto].address = array[j]; // fill the new base with content
-          }
-        }
-        else {
-          newline["addresses"][4].address = resultarray[i][8]; // // put the address into array
-        }
+        newline["addresses"][4].address = resultarray[i][8]; // // put the address into array
       }
       else {
         newline["addresses"][4].address = '';
