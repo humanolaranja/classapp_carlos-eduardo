@@ -25,7 +25,7 @@ fs.createReadStream(input)
   })
   .on('end',function() {
     var final = fillData(resultarray, base); // call function to fill all data based on base json
-    console.log(JSON.stringify(final)); // print the final json
+    // console.log(JSON.stringify(final)); // print the final json
     fs.writeFile('./files/output.json', JSON.stringify(final, null, 4), function(err) {
       if(err) {
         console.log(err);
