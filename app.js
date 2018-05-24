@@ -85,54 +85,139 @@ function fillData(resultarray, base) {
     var newline = new Object(); // create an new base object for each iteration
     newline     = base;
 
-    if((searchPersonByName(resultarray[i][0], final)) > -1)
+    var place = (searchPersonByName(resultarray[i][0], final));
+    if(place > -1) // if are already in the final array
     {
-      // console.log("Já tem");
+
+      // put all classes
+      resultarray[i][2]                = resultarray[i][2].split(' / ').join(',').split(', '); // separate classes if has / or ,
+      resultarray[i][3]                = resultarray[i][3].split(' / ').join(',').split(', '); // separate classes if has / or ,
+      var temp                         = resultarray[i][2].concat(resultarray[i][3]); // concat 2 arrays of classes
+      temp                             = temp.filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
+      for (let i = 0; i < temp.length; i++) {
+        final[place]["classes"].push(temp[i]);
+      }
+
+      //put the invisible
+      if((final[place]["invisible"] == false) && (resultarray[i][10] == '1' || resultarray[i][10] == 'yes' || resultarray[i][10] == true)) {
+        final[place]["invisible"]   = true // put the invisible into array
+      }
+
+      //filter see_all
+      if((final[place]["see_all"] == false) && (resultarray[i][11] == '1' || resultarray[i][11] == 'yes' || resultarray[i][11] == true)) {
+        final[place]["see_all"]   = true // put the invisible into array
+      }
     }
     else {
       // put name and eid
       newline["fullname"]              = resultarray[i][0]; // put the name into array
       newline["eid"]                   = resultarray[i][1]; // put the eid into array
 
+
       // filter classes
       resultarray[i][2]                = resultarray[i][2].split(' / ').join(',').split(','); // separate classes if has / or ,
       resultarray[i][3]                = resultarray[i][3].split(' / ').join(',').split(','); // separate classes if has / or ,
       newline["classes"]               = resultarray[i][2].concat(resultarray[i][3]); // concat 2 arrays of classes
       newline["classes"]               = newline["classes"].filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
-
-      //filter the address
-      if(filterTel(resultarray[i][4])) {
-        resultarray[i][4] = filterTel(resultarray[i][4]);
-        newline["addresses"][0].address  = resultarray[i][4]; // put the address into array
+      if(newline["classes"].length == 1) {
+        newline["classes"] = newline["classes"][0];
       }
-      if(filterTel(resultarray[i][5])) {
+
+      //filter the address (email)
+      if(validateEmail(resultarray[i][4])) { // if is an valid email
+        var array = resultarray[i][4].split('/'); // separate emails if has /
+        if(array.length > 1) { // if has more then one email
+          for(let j = 0; j < array.length; j++) {
+            var newobject = newline["addresses"][0];  // copy the base
+            var whereto   = (newline["addresses"].length); // set where this data will be in the array
+            newline["addresses"].push(newobject); // put the base
+            newline["addresses"][whereto].address = array[j]; // fill the new base with content
+          }
+        }
+        else {
+          newline["addresses"][0].address = resultarray[i][4]; // // put the address into array
+        }
+      }
+      else {
+        newline["addresses"][0].address = ''; // set address as null
+      }
+
+      //filter the address (phone)
+      if(filterTel(resultarray[i][5])) { // if is an valid tel
         resultarray[i][5] = filterTel(resultarray[i][5]);
         newline["addresses"][1].address  = resultarray[i][5]; // put the address into array
       }
-      if(filterTel(resultarray[i][6])) {
+      else {
+        newline["addresses"][1].address  = '' ;
+      }
+
+
+      //filter the address (phone)
+      if(filterTel(resultarray[i][6])) { // if is an valid tel
         resultarray[i][6] = filterTel(resultarray[i][6]);
         newline["addresses"][2].address  = resultarray[i][6]; // put the address into array
       }
-      if(filterTel(resultarray[i][7])) {
-        resultarray[i][7] = filterTel(resultarray[i][7]);
-        newline["addresses"][3].address  = resultarray[i][7]; // put the address into array
+      else {
+        newline["addresses"][2].address  = '' ;
       }
-      if(filterTel(resultarray[i][8])) {
-        resultarray[i][8] = filterTel(resultarray[i][8]);
-        newline["addresses"][4].address  = resultarray[i][8]; // put the address into array
+
+      //filter the address (email)
+      if(validateEmail(resultarray[i][7])) { // if is an valid email
+        var array = resultarray[i][7].split('/'); // separate emails if has /
+        if(array.length > 1) { // if has more then one email
+          for(let j = 0; j < array.length; j++) {
+            var newobject = newline["addresses"][3];  // copy the base
+            var whereto   = (newline["addresses"].length); // set where this data will be in the array
+            newline["addresses"].push(newobject); // put the base
+            newline["addresses"][whereto].address = array[j]; // fill the new base with content
+          }
+        }
+        else {
+          newline["addresses"][3].address = resultarray[i][7]; // // put the address into array
+        }
       }
-      if(filterTel(resultarray[i][9])) {
+      else {
+        newline["addresses"][3].address = ''; // set address as null
+      }
+
+
+      //filter the address (email)
+      if(validateEmail(resultarray[i][8])) { // if is an valid email
+        var array = resultarray[i][8].split('/'); // separate emails if has /
+        if(array.length > 1) { // if has more then one email
+          for(let j = 0; j < array.length; j++) {
+            var newobject = newline["addresses"][4];  // copy the base
+            var whereto   = (newline["addresses"].length); // set where this data will be in the array
+            newline["addresses"].push(newobject); // put the base
+            newline["addresses"][whereto].address = array[j]; // fill the new base with content
+          }
+        }
+        else {
+          newline["addresses"][4].address = resultarray[i][8]; // // put the address into array
+        }
+      }
+      else {
+        newline["addresses"][4].address = '';
+      }
+
+      //filter the address (phone)
+      if(filterTel(resultarray[i][9])) { // if is an valid tel
         resultarray[i][9] = filterTel(resultarray[i][9]);
         newline["addresses"][5].address  = resultarray[i][9]; // put the address into array
       }
+      else {
+        newline["addresses"][5].address = '';
+      }
 
-      //filter the result
+
+      //filter the invisible
       if(resultarray[i][10] == '' || resultarray[i][10] == '0' || resultarray[i][10] == 'no') {
         newline["invisible"]             = false // put the invisible into array
       }
       else {
         newline["invisible"]             = true // put the invisible into array
       }
+
 
       //filter see_all
       if(resultarray[i][11] == '' || resultarray[i][11] == '0' || resultarray[i][11] == 'no') {
@@ -141,12 +226,15 @@ function fillData(resultarray, base) {
       else {
         newline["see_all"]               = true // put the invisible into array
       }
-    }
 
-    var json = JSON.stringify(newline); // convert into string json
-    var json = JSON.parse(json); // convert into object json
-    final.push(json); // put this json into final array
+      var json = JSON.stringify(newline); // convert into string json
+      var json = JSON.parse(json); // convert into object json
+      final.push(json); // put this json into final array
+
+    }
   }
+  // remove all null address in the last iteration
+  final = removeAllNullAddress(final);
 
   return final;
 }
@@ -177,7 +265,7 @@ function filterTel(number) {
     number = phoneUtil.parse('123', 'BR');
   }
 
-  if(phoneUtil.isPossibleNumber(number)) {
+  if(phoneUtil.isValidNumberForRegion(number, 'BR')) {
     number = phoneUtil.format(number, PNF.E164); // format the number
     number = number.slice(1); // remove the plus sign
     return number;
@@ -185,4 +273,39 @@ function filterTel(number) {
   else {
     return false;
   }
+}
+
+/**
+  *
+  *
+  */
+function validateEmail(email)
+{
+  var re = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  return re.test(email);
+}
+
+/**
+  *
+  *
+  */
+function removeAllNullAddress(array) {
+  for (let i = 0; i < array.length; i++) {
+    for (let j = 0; j < array[i]["addresses"].length; j++) {
+      if((array[i]["addresses"][j]["address"]) == '') {
+        array[i]["addresses"][j] = ''; // set all null address as null in addresses
+      }
+    }
+  }
+
+  for (let i = 0; i < array.length; i++) {
+    for (var j = 0; j < array[i]["addresses"].length; j++) {
+      if((array[i]["addresses"][j]) == '' || (array[i]["addresses"][j]) == null) {
+        array[i]["addresses"].splice(j, 1); // remove all null content un addresses
+        j = -1; // start searching again, because now the array size is different
+      }
+    }
+  }
+
+  return array;
 }
