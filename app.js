@@ -25,7 +25,14 @@ fs.createReadStream(input)
   })
   .on('end',function() {
     var final = fillData(resultarray, base); // call function to fill all data based on base json
-    console.log(JSON.stringify(final)); // print the final josn
+    console.log(JSON.stringify(final)); // print the final json
+    fs.writeFile('./files/output.json', JSON.stringify(final, null, 4), function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        console.log("JSON saved into ./files/output.json");
+      }
+    });
   });
 
 
@@ -212,7 +219,15 @@ function fillData(resultarray, base) {
 
       //filter the address (email)
       if(validateEmail(resultarray[i][4])) { // if is an valid email
-        newline["addresses"][0].address = resultarray[i][4]; // // put the address into array
+        var hasAddress = searchAddress(resultarray[i][4], newline["addresses"]); // verify if the address already exists
+        if(hasAddress) {
+          for (let i = 0; i < newline["addresses"][0]["tags"].length; i++) {
+            newline["addresses"][hasAddress]["tags"].push(newline["addresses"][0]["tags"][i]); // just put all tags together
+          }
+        }
+        else {
+          newline["addresses"][0].address = resultarray[i][4]; // // put the address into array
+        }
       }
       else {
         newline["addresses"][0].address = ''; // set address as null
@@ -239,7 +254,15 @@ function fillData(resultarray, base) {
 
       //filter the address (email)
       if(validateEmail(resultarray[i][7])) { // if is an valid email
-        newline["addresses"][3].address = resultarray[i][7]; // // put the address into array
+        var hasAddress = searchAddress(resultarray[i][7], newline["addresses"]); // verify if the address already exists
+        if(hasAddress) {
+          for (let i = 0; i < newline["addresses"][3]["tags"].length; i++) {
+            newline["addresses"][hasAddress]["tags"].push(newline["addresses"][3]["tags"][i]); // just put all tags together
+          }
+        }
+        else {
+          newline["addresses"][3].address = resultarray[i][7]; // // put the address into array
+        }
       }
       else {
         newline["addresses"][3].address = ''; // set address as null
@@ -248,7 +271,15 @@ function fillData(resultarray, base) {
 
       //filter the address (email)
       if(validateEmail(resultarray[i][8])) { // if is an valid email
-        newline["addresses"][4].address = resultarray[i][8]; // // put the address into array
+        var hasAddress = searchAddress(resultarray[i][8], newline["addresses"]); // verify if the address already exists
+        if(hasAddress) {
+          for (let i = 0; i < newline["addresses"][4]["tags"].length; i++) {
+            newline["addresses"][hasAddress]["tags"].push(newline["addresses"][4]["tags"][i]); // just put all tags together
+          }
+        }
+        else {
+          newline["addresses"][4].address = resultarray[i][8]; // // put the address into array
+        }
       }
       else {
         newline["addresses"][4].address = '';
@@ -362,4 +393,19 @@ function removeAllNullAddress(array) {
   }
 
   return array;
+}
+
+
+/**
+  *
+  *
+  */
+function searchAddress(address, addresses)  {
+  for (var i = 0; i < addresses.length; i++) {
+    if(addresses[i].address == address)
+    {
+      return i;
+    }
+  }
+  return false;
 }
