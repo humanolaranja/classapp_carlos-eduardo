@@ -1,3 +1,7 @@
+/**
+ * @author Carlos Eduardo (Humano Laranja) <contato.carlos@outlook.com>
+ */
+
 // dependencies
 const fs        = require('fs');
 const parse     = require('csv-parse');
@@ -37,8 +41,10 @@ fs.createReadStream(input)
 
 
 /**
-  *
-  */
+ * a function that returns a base json based on header
+ * @param {array} header - the header array
+ * @return {object} the base json
+ */
 function getBase(header) {
 
   var obj = new Object(); // grant that each var is an different object
@@ -81,9 +87,11 @@ function getBase(header) {
 }
 
 /**
-  *
-  *
-  */
+ * a function that returns the base json filled with content
+ * @param {array} resultarray - the harray that contains all data
+ * @param {array} base - the json to use as base
+ * @return {object} the base json filled with data
+ */
 function fillData(resultarray, base) {
 
   var final = new Array(); // create an array to put all data
@@ -325,9 +333,11 @@ function fillData(resultarray, base) {
 }
 
 /**
-  *
-  *
-  */
+ * a function to search people in the array based on a name
+ * @param {string} name - the name to search
+ * @param {array} final - the array to serach
+ * @return {integer} the index found, or -1 if not found
+ */
 function searchPersonByName(name, final) {
   for(let i = 0; i < Object.keys(final).length; i++) {
     if(final[i]["fullname"] == name) {
@@ -339,9 +349,10 @@ function searchPersonByName(name, final) {
 
 
 /**
-  *
-  *
-  */
+ * a function that verify if an number given is a valid number
+ * @param {string} number - the number to verify
+ * @return {mixed} the number filtered or -1 if not valid
+ */
 function filterTel(number) {
   try {
     number = phoneUtil.parse(number, 'BR');
@@ -361,8 +372,9 @@ function filterTel(number) {
 }
 
 /**
-  *
-  *
+  * a function that verify if an email is valid
+  * @param {string} email - the email to verify
+  * @return {boolean} true or false
   */
 function validateEmail(email)
 {
@@ -371,8 +383,9 @@ function validateEmail(email)
 }
 
 /**
-  *
-  *
+  * a function to remove all objects that has null address
+  * @param {array} array - array to revove objects
+  * @return {array} new array with no null addresses
   */
 function removeAllNullAddress(array) {
   for (let i = 0; i < array.length; i++) {
@@ -397,9 +410,11 @@ function removeAllNullAddress(array) {
 
 
 /**
-  *
-  *
-  */
+ * a function to search address in array
+ * @param {string} address - the address to search
+ * @param {array} addresses - the array to search the address
+ * @return {mixed} index if found, false if not found
+ */
 function searchAddress(address, addresses)  {
   for (var i = 0; i < addresses.length; i++) {
     if(addresses[i].address == address)
