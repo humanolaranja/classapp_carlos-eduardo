@@ -304,10 +304,15 @@ function fillData(resultarray, base, where) {
         }
       }
 
+      newline["classes"] = Array();
       // filter classes
-      resultarray[i][2]                = resultarray[i][2].split(' / ').join(',').split(','); // separate classes if has / or ,
-      resultarray[i][3]                = resultarray[i][3].split(' / ').join(',').split(','); // separate classes if has / or ,
-      newline["classes"]               = resultarray[i][2].concat(resultarray[i][3]); // concat 2 arrays of classes
+      for (let j = 0; j < where["classes"].length; j++) {
+        resultarray[i][where["classes"][j]] = resultarray[i][where["classes"][j]].split(' / ').join(',').split(','); // separate classes if has / or ,
+      }
+      for (let j = 0; j < where["classes"].length; j++) {
+        newline["classes"].push(resultarray[i][where["classes"][j]]);
+      }
+      newline["classes"] = newline["classes"].flat();
       newline["classes"]               = newline["classes"].filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
       if(newline["classes"].length == 1) {
         newline["classes"] = newline["classes"][0];
@@ -448,3 +453,11 @@ function filterAddress(type, content)  {
       return validateEmail(content);
   }
 }
+
+Object.defineProperty(Array.prototype, 'flat', {
+    value: function(depth = 1) {
+      return this.reduce(function (flat, toFlatten) {
+        return flat.concat((Array.isArray(toFlatten) && (depth-1)) ? toFlatten.flat(depth-1) : toFlatten);
+      }, []);
+    }
+});
