@@ -30,7 +30,6 @@ fs.createReadStream(input)
   })
   .on('end',function() {
     var final = fillData(resultarray, base, where); // call function to fill all data based on base json
-    // console.log(JSON.stringify(final)); // print the final json
     fs.writeFile('./files/output.json', JSON.stringify(final, null, 2), function(err) {
       if(err) {
         console.log(err);
@@ -64,7 +63,6 @@ function getBase(header) {
       }
       header[i] = header[i].replace('email ', ''); //remove the type in the string
       header[i] = header[i].replace('phone ', ''); //remove the type in the string
-
       header[i] = header[i].split(', ');
 
       var addressobj = new Object();
@@ -94,55 +92,43 @@ function getBase(header) {
  * @return {array} the where array
  */
 function getWhere(header) {
-  var fullname = new Object();
-  var eid = new Object();
-  var invisible = new Object();
-  var see_all = new Object();
-  var classes = new Array();
-  var emails = new Array();
-  var phones = new Array();
   var where = new Array();
+  where["classes"] = new Array();
+  where["emails"] = new Array();
+  where["phones"] = new Array();
 
   for(let i = 0; i < header.length; i++)
   {
     if(header[i].includes('email') || header[i].includes('phone')) {
       if(header[i].includes('email')) {
-        emails.push(i);
+        where["emails"].push(i);
       }
       else{
-        phones.push(i);
+        where["phones"].push(i);
       }
     }
     else{
       switch (header[i]) {
         case 'class':
-          classes.push(i);
+          where["classes"].push(i);
           break;
         case 'eid':
-          eid = i;
+          where["eid"] = i;
           break;
         case 'fullname':
-          fullname = i;
+          where["fullname"] = i;
           break;
         case 'invisible':
-          invisible = i;
+          where["invisible"] = i;
           break;
         case 'see_all':
-          see_all = i;
+          where["see_all"] = i;
           break;
         default:
           console.log("Erro: Entre em contato com o suporte");
       }
     }
   }
-
-  where['eid']        = eid;
-  where['fullname']   = fullname;
-  where['invisible']  = invisible;
-  where['see_all']    = see_all;
-  where['classes']    = classes;
-  where['emails']     = emails;
-  where['phones']     = phones;
 
   return where;
 }
@@ -283,7 +269,6 @@ function fillData(resultarray, base, where) {
       var json = JSON.stringify(newline); // convert into string json
       var json = JSON.parse(json); // convert into object json
       final.push(json); // put this json into final array
-
     }
   }
   // remove all null address in the last iteration
@@ -401,9 +386,9 @@ function filterAddress(type, content)  {
 }
 
 Object.defineProperty(Array.prototype, 'flat', {
-    value: function(depth = 1) {
-      return this.reduce(function (flat, toFlatten) {
-        return flat.concat((Array.isArray(toFlatten) && (depth-1)) ? toFlatten.flat(depth-1) : toFlatten);
-      }, []);
-    }
+  value: function(depth = 1) {
+    return this.reduce(function (flat, toFlatten) {
+      return flat.concat((Array.isArray(toFlatten) && (depth-1)) ? toFlatten.flat(depth-1) : toFlatten);
+    }, []);
+  }
 });
