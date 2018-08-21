@@ -29,9 +29,9 @@ fs.createReadStream(input)
     index++; // increments index
   })
   .on('end',function() {
-    var final = fillData(resultarray, base); // call function to fill all data based on base json
+    var final = fillData(resultarray, base, where); // call function to fill all data based on base json
     // console.log(JSON.stringify(final)); // print the final json
-    fs.writeFile('./files/output.json', JSON.stringify(final, null, 4), function(err) {
+    fs.writeFile('./files/output.json', JSON.stringify(final, null, 2), function(err) {
       if(err) {
         console.log(err);
       } else {
@@ -87,6 +87,12 @@ function getBase(header) {
   return obj;
 }
 
+
+/**
+ * a function that returns where the columns are
+ * @param {array} header - the header array
+ * @return {array} the where array
+ */
 function getWhere(header) {
   var fullname = new Object();
   var eid = new Object();
@@ -145,9 +151,10 @@ function getWhere(header) {
  * a function that returns the base json filled with content
  * @param {array} resultarray - the harray that contains all data
  * @param {array} base - the json to use as base
+ * @param {array} where - the array to know where columns are
  * @return {object} the base json filled with data
  */
-function fillData(resultarray, base) {
+function fillData(resultarray, base, where) {
 
   var final = new Array(); // create an array to put all data
 
@@ -267,8 +274,8 @@ function fillData(resultarray, base) {
     }
     else {
       // put name and eid
-      newline["fullname"]              = resultarray[i][0]; // put the name into array
-      newline["eid"]                   = resultarray[i][1]; // put the eid into array
+      newline["fullname"]              = resultarray[i][where["fullname"]]; // put the name into array
+      newline["eid"]                   = resultarray[i][where["eid"]]; // put the eid into array
 
 
       // filter classes
