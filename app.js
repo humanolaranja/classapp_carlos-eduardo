@@ -165,7 +165,7 @@ function fillData(resultarray, base, where) {
     var place = (searchPersonByName(resultarray[i][0], final));
     if(place > -1) // if are already in the final array
     {
-
+      continue;
       // put all classes
       resultarray[i][2]                = resultarray[i][2].split(' / ').join(',').split(', '); // separate classes if has / or ,
       resultarray[i][3]                = resultarray[i][3].split(' / ').join(',').split(', '); // separate classes if has / or ,
@@ -277,6 +277,32 @@ function fillData(resultarray, base, where) {
       newline["fullname"]              = resultarray[i][where["fullname"]]; // put the name into array
       newline["eid"]                   = resultarray[i][where["eid"]]; // put the eid into array
 
+      //filter Addresses
+      var countWherePhone = 0;
+      var countWhereEmail = 0;
+      for (let j = 0; j < newline["addresses"].length; j++) {
+        if(newline["addresses"][j].type == 'phone'){
+          newline["addresses"][j].address = filterAddress('phone', resultarray[i][where['phones'][countWherePhone]]);
+          countWherePhone++;
+        }
+        else{
+          if(filterAddress('email', resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
+            var hasAddress = searchAddress(resultarray[i][where['emails'][countWhereEmail]], newline["addresses"]); // verify if the address already exists
+            if(hasAddress) {
+              for (let i = 0; i < newline["addresses"][j]["tags"].length; i++) {
+                newline["addresses"][hasAddress]["tags"].push(newline["addresses"][j]["tags"][i]); // just put all tags together
+              }
+            }
+            else {
+              newline["addresses"][j].address = resultarray[i][where['emails'][countWhereEmail]]; // // put the address into array
+            }
+          }
+          else {
+            newline["addresses"][j].address = ''; // set address as null
+          }
+          countWhereEmail++;
+        }
+      }
 
       // filter classes
       resultarray[i][2]                = resultarray[i][2].split(' / ').join(',').split(','); // separate classes if has / or ,
@@ -287,95 +313,16 @@ function fillData(resultarray, base, where) {
         newline["classes"] = newline["classes"][0];
       }
 
-      //filter the address (email)
-      if(validateEmail(resultarray[i][4])) { // if is an valid email
-        var hasAddress = searchAddress(resultarray[i][4], newline["addresses"]); // verify if the address already exists
-        if(hasAddress) {
-          for (let i = 0; i < newline["addresses"][0]["tags"].length; i++) {
-            newline["addresses"][hasAddress]["tags"].push(newline["addresses"][0]["tags"][i]); // just put all tags together
-          }
-        }
-        else {
-          newline["addresses"][0].address = resultarray[i][4]; // // put the address into array
-        }
-      }
-      else {
-        newline["addresses"][0].address = ''; // set address as null
-      }
-
-      //filter the address (phone)
-      if(filterTel(resultarray[i][5])) { // if is an valid tel
-        resultarray[i][5] = filterTel(resultarray[i][5]);
-        newline["addresses"][1].address  = resultarray[i][5]; // put the address into array
-      }
-      else {
-        newline["addresses"][1].address  = '' ;
-      }
-
-
-      //filter the address (phone)
-      if(filterTel(resultarray[i][6])) { // if is an valid tel
-        resultarray[i][6] = filterTel(resultarray[i][6]);
-        newline["addresses"][2].address  = resultarray[i][6]; // put the address into array
-      }
-      else {
-        newline["addresses"][2].address  = '' ;
-      }
-
-      //filter the address (email)
-      if(validateEmail(resultarray[i][7])) { // if is an valid email
-        var hasAddress = searchAddress(resultarray[i][7], newline["addresses"]); // verify if the address already exists
-        if(hasAddress) {
-          for (let i = 0; i < newline["addresses"][3]["tags"].length; i++) {
-            newline["addresses"][hasAddress]["tags"].push(newline["addresses"][3]["tags"][i]); // just put all tags together
-          }
-        }
-        else {
-          newline["addresses"][3].address = resultarray[i][7]; // // put the address into array
-        }
-      }
-      else {
-        newline["addresses"][3].address = ''; // set address as null
-      }
-
-
-      //filter the address (email)
-      if(validateEmail(resultarray[i][8])) { // if is an valid email
-        var hasAddress = searchAddress(resultarray[i][8], newline["addresses"]); // verify if the address already exists
-        if(hasAddress) {
-          for (let i = 0; i < newline["addresses"][4]["tags"].length; i++) {
-            newline["addresses"][hasAddress]["tags"].push(newline["addresses"][4]["tags"][i]); // just put all tags together
-          }
-        }
-        else {
-          newline["addresses"][4].address = resultarray[i][8]; // // put the address into array
-        }
-      }
-      else {
-        newline["addresses"][4].address = '';
-      }
-
-      //filter the address (phone)
-      if(filterTel(resultarray[i][9])) { // if is an valid tel
-        resultarray[i][9] = filterTel(resultarray[i][9]);
-        newline["addresses"][5].address  = resultarray[i][9]; // put the address into array
-      }
-      else {
-        newline["addresses"][5].address = '';
-      }
-
-
       //filter the invisible
-      if(resultarray[i][10] == '' || resultarray[i][10] == '0' || resultarray[i][10] == 'no') {
+      if(resultarray[i][where["invisible"]] == '' || resultarray[i][where["invisible"]] == '0' || resultarray[i][where["invisible"]] == 'no') {
         newline["invisible"]             = false // put the invisible into array
       }
       else {
         newline["invisible"]             = true // put the invisible into array
       }
 
-
       //filter see_all
-      if(resultarray[i][11] == '' || resultarray[i][11] == '0' || resultarray[i][11] == 'no') {
+      if(resultarray[i][where["see_all"]] == '' || resultarray[i][where["see_all"]] == '0' || resultarray[i][where["see_all"]] == 'no') {
         newline["see_all"]               = false // put the invisible into array
       }
       else {
@@ -485,4 +432,19 @@ function searchAddress(address, addresses)  {
     }
   }
   return false;
+}
+
+/**
+ * a function to filter address
+ * @param {string} type - the address type
+ * @param {array} content - the content to filter
+ * @return {string} filtered content
+ */
+function filterAddress(type, content)  {
+  switch (type) {
+    case 'phone':
+      return filterTel(content);
+    case 'email':
+      return validateEmail(content);
+  }
 }
