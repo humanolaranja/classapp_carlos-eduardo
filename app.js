@@ -165,7 +165,38 @@ function fillData(resultarray, base, where) {
     var place = (searchPersonByName(resultarray[i][0], final));
     if(place > -1) // if are already in the final array
     {
-      continue;
+      //filter Addresses
+      var countWherePhone = 0;
+      var countWhereEmail = 0;
+      for (let j = 0; j < newline["addresses"].length; j++) {
+        var newobject = new Object(); // create new object
+        newobject = JSON.parse(JSON.stringify(newline["addresses"][j])); // use this object but not with reference
+        if(newline["addresses"][j].type == 'phone'){
+          newobject.address = filterAddress('phone', resultarray[i][where['phones'][countWherePhone]]); // put the address
+          final[place]["addresses"].push(newobject); // put into addresses
+          countWherePhone++;
+        }
+
+
+        else {
+        /*  if(filterAddress('email', resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
+            var hasAddress = searchAddress(resultarray[i][where['emails'][countWhereEmail]], newline["addresses"]); // verify if the address already exists
+            if(hasAddress) {
+              for (let i = 0; i < newline["addresses"][j]["tags"].length; i++) {
+                newline["addresses"][hasAddress]["tags"].push(newline["addresses"][j]["tags"][i]); // just put all tags together
+              }
+            }
+            else {
+              newline["addresses"][j].address = resultarray[i][where['emails'][countWhereEmail]]; // // put the address into array
+            }
+          }
+          else {
+            newline["addresses"][j].address = ''; // set address as null
+          }
+          countWhereEmail++;*/
+        }
+      }
+
       // put all classes
       resultarray[i][2]                = resultarray[i][2].split(' / ').join(',').split(', '); // separate classes if has / or ,
       resultarray[i][3]                = resultarray[i][3].split(' / ').join(',').split(', '); // separate classes if has / or ,
@@ -194,22 +225,6 @@ function fillData(resultarray, base, where) {
           newobject.address = resultarray[i][4]; // put the address
           final[place]["addresses"].push(newobject); // put into addresses
         }
-      }
-
-      //put the address (phone)
-      if(filterTel(resultarray[i][5])) { // if is an valid tel
-        var newobject = new Object(); // create new object
-        newobject = JSON.parse(JSON.stringify(newline["addresses"][1])); // use this object but not with reference
-        newobject.address = filterTel(resultarray[i][5]); // put the address
-        final[place]["addresses"].push(newobject); // put into addresses
-      }
-
-      //put the address (phone)
-      if(filterTel(resultarray[i][6])) { // if is an valid tel
-        var newobject = new Object(); // create new object
-        newobject = JSON.parse(JSON.stringify(newline["addresses"][2])); // use this object but not with reference
-        newobject.address = filterTel(resultarray[i][6]); // put the address
-        final[place]["addresses"].push(newobject); // put into addresses
       }
 
       //filter the address (email)
@@ -254,21 +269,13 @@ function fillData(resultarray, base, where) {
         }
       }
 
-      //put the address (phone)
-      if(filterTel(resultarray[i][9])) { // if is an valid tel
-        var newobject = new Object(); // create new object
-        newobject = JSON.parse(JSON.stringify(newline["addresses"][5])); // use this object but not with reference
-        newobject.address = filterTel(resultarray[i][9]); // put the address
-        final[place]["addresses"].push(newobject); // put into addresses
-      }
-
       //put the invisible
-      if((final[place]["invisible"] == false) && (resultarray[i][10] == '1' || resultarray[i][10] == 'yes' || resultarray[i][10] == true)) {
+      if((final[place]["invisible"] == false) && (resultarray[i][where["invisible"]] == '1' || resultarray[i][where["invisible"]] == 'yes' || resultarray[i][where["invisible"]] == true)) {
         final[place]["invisible"]   = true // put the invisible into array
       }
 
       //filter see_all
-      if((final[place]["see_all"] == false) && (resultarray[i][11] == '1' || resultarray[i][11] == 'yes' || resultarray[i][11] == true)) {
+      if((final[place]["see_all"] == false) && (resultarray[i][where["see_all"]] == '1' || resultarray[i][where["see_all"]] == 'yes' || resultarray[i][where["see_all"]] == true)) {
         final[place]["see_all"]   = true // put the invisible into array
       }
     }
