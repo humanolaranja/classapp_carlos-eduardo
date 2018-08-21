@@ -190,8 +190,6 @@ function fillData(resultarray, base, where) {
           }
           else {
             if(validateEmail(resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
-              var newobject = new Object(); // create new object
-              newobject = JSON.parse(JSON.stringify(newline["addresses"][j])); // use this object but not with reference
               newobject.address = resultarray[i][where['emails'][countWhereEmail]]; // put the address
               final[place]["addresses"].push(newobject); // put into addresses
             }
@@ -201,9 +199,12 @@ function fillData(resultarray, base, where) {
       }
 
       // put all classes
-      resultarray[i][2]                = resultarray[i][2].split(' / ').join(',').split(', '); // separate classes if has / or ,
-      resultarray[i][3]                = resultarray[i][3].split(' / ').join(',').split(', '); // separate classes if has / or ,
-      var temp                         = resultarray[i][2].concat(resultarray[i][3]); // concat 2 arrays of classes
+      var temp = Array();
+      for (let j = 0; j < where["classes"].length; j++) {
+        resultarray[i][where["classes"][j]]                = resultarray[i][where["classes"][j]].split(' / ').join(',').split(', '); // separate classes if has / or ,
+        temp.push(resultarray[i][where["classes"][j]]);
+      }
+      temp = temp.flat();
       temp                             = temp.filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
       for (let i = 0; i < temp.length; i++) {
         final[place]["classes"].push(temp[i]);
@@ -255,8 +256,6 @@ function fillData(resultarray, base, where) {
       // filter classes
       for (let j = 0; j < where["classes"].length; j++) {
         resultarray[i][where["classes"][j]] = resultarray[i][where["classes"][j]].split(' / ').join(',').split(','); // separate classes if has / or ,
-      }
-      for (let j = 0; j < where["classes"].length; j++) {
         newline["classes"].push(resultarray[i][where["classes"][j]]);
       }
       newline["classes"] = newline["classes"].flat();
