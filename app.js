@@ -18,6 +18,7 @@ fs.createReadStream(input)
   .pipe(parse({delimiter: ','}))
   .on('data', function(csvrow) {
     if(index == 0) {
+      where = getWhere(csvrow); // get where columns are in csv
       base = getBase(csvrow); // get base json to fill with data
     }
     else {
@@ -84,6 +85,60 @@ function getBase(header) {
   }
 
   return obj;
+}
+
+function getWhere(header) {
+  var fullname = new Object();
+  var eid = new Object();
+  var invisible = new Object();
+  var see_all = new Object();
+  var classes = new Array();
+  var emails = new Array();
+  var phones = new Array();
+  var where = new Array();
+
+  for(let i = 0; i < header.length; i++)
+  {
+    if(header[i].includes('email') || header[i].includes('phone')) {
+      if(header[i].includes('email')) {
+        emails.push(i);
+      }
+      else{
+        phones.push(i);
+      }
+    }
+    else{
+      switch (header[i]) {
+        case 'class':
+          classes.push(i);
+          break;
+        case 'eid':
+          eid = i;
+          break;
+        case 'fullname':
+          fullname = i;
+          break;
+        case 'invisible':
+          invisible = i;
+          break;
+        case 'see_all':
+          see_all = i;
+          break;
+        default:
+          console.log("Erro: Entre em contato com o suporte");
+      }
+    }
+  }
+
+  where['eid']        = eid;
+  where['fullname']   = fullname;
+  where['invisible']  = invisible;
+  where['see_all']    = see_all;
+  where['classes']    = classes;
+  where['emails']     = emails;
+  where['phones']     = phones;
+
+  return where;
 }
 
 /**
