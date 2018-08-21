@@ -176,24 +176,27 @@ function fillData(resultarray, base, where) {
           final[place]["addresses"].push(newobject); // put into addresses
           countWherePhone++;
         }
-
-
         else {
-        /*  if(filterAddress('email', resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
-            var hasAddress = searchAddress(resultarray[i][where['emails'][countWhereEmail]], newline["addresses"]); // verify if the address already exists
-            if(hasAddress) {
-              for (let i = 0; i < newline["addresses"][j]["tags"].length; i++) {
-                newline["addresses"][hasAddress]["tags"].push(newline["addresses"][j]["tags"][i]); // just put all tags together
+          var emails = resultarray[i][where['emails'][countWhereEmail]].split('/'); // separate emails if has /
+          if(emails.length > 1) {
+            for (let i = 0; i < emails.length; i++) {
+              if(validateEmail(emails[i])) {
+                var newobject = new Object(); // create new object
+                newobject = JSON.parse(JSON.stringify(newline["addresses"][j])); // use this object but not with reference
+                newobject.address = emails[i]; // put the address
+                final[place]["addresses"].push(newobject); // put into addresses
               }
-            }
-            else {
-              newline["addresses"][j].address = resultarray[i][where['emails'][countWhereEmail]]; // // put the address into array
             }
           }
           else {
-            newline["addresses"][j].address = ''; // set address as null
+            if(validateEmail(resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
+              var newobject = new Object(); // create new object
+              newobject = JSON.parse(JSON.stringify(newline["addresses"][j])); // use this object but not with reference
+              newobject.address = resultarray[i][where['emails'][countWhereEmail]]; // put the address
+              final[place]["addresses"].push(newobject); // put into addresses
+            }
           }
-          countWhereEmail++;*/
+          countWhereEmail++;
         }
       }
 
@@ -204,69 +207,6 @@ function fillData(resultarray, base, where) {
       temp                             = temp.filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
       for (let i = 0; i < temp.length; i++) {
         final[place]["classes"].push(temp[i]);
-      }
-
-      //filter the address (email)
-      var emails = resultarray[i][4].split('/'); // separate emails if has /
-      if(emails.length > 1) {
-        for (let i = 0; i < emails.length; i++) {
-          if(validateEmail(emails[i])) {
-            var newobject = new Object(); // create new object
-            newobject = JSON.parse(JSON.stringify(newline["addresses"][0])); // use this object but not with reference
-            newobject.address = emails[i]; // put the address
-            final[place]["addresses"].push(newobject); // put into addresses
-          }
-        }
-      }
-      else {
-        if(validateEmail(resultarray[i][4])) { // if is an valid email
-          var newobject = new Object(); // create new object
-          newobject = JSON.parse(JSON.stringify(newline["addresses"][0])); // use this object but not with reference
-          newobject.address = resultarray[i][4]; // put the address
-          final[place]["addresses"].push(newobject); // put into addresses
-        }
-      }
-
-      //filter the address (email)
-      var emails = resultarray[i][7].split('/'); // separate emails if has /
-      if(emails.length > 1) {
-        for (let i = 0; i < emails.length; i++) {
-          if(validateEmail(emails[i])) {
-            var newobject = new Object(); // create new object
-            newobject = JSON.parse(JSON.stringify(newline["addresses"][3])); // use this object but not with reference
-            newobject.address = emails[i]; // put the address
-            final[place]["addresses"].push(newobject); // put into addresses
-          }
-        }
-      }
-      else {
-        if(validateEmail(resultarray[i][7])) { // if is an valid email
-          var newobject = new Object(); // create new object
-          newobject = JSON.parse(JSON.stringify(newline["addresses"][3])); // use this object but not with reference
-          newobject.address = resultarray[i][7]; // put the address
-          final[place]["addresses"].push(newobject); // put into addresses
-        }
-      }
-
-      //filter the address (email)
-      var emails = resultarray[i][8].split('/'); // separate emails if has /
-      if(emails.length > 1) {
-        for (let i = 0; i < emails.length; i++) {
-          if(validateEmail(emails[i])) {
-            var newobject = new Object(); // create new object
-            newobject = JSON.parse(JSON.stringify(newline["addresses"][4])); // use this object but not with reference
-            newobject.address = emails[i]; // put the address
-            final[place]["addresses"].push(newobject); // put into addresses
-          }
-        }
-      }
-      else {
-        if(validateEmail(resultarray[i][8])) { // if is an valid email
-          var newobject = new Object(); // create new object
-          newobject = JSON.parse(JSON.stringify(newline["addresses"][4])); // use this object but not with reference
-          newobject.address = resultarray[i][8]; // put the address
-          final[place]["addresses"].push(newobject); // put into addresses
-        }
       }
 
       //put the invisible
