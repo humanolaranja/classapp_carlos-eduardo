@@ -148,7 +148,7 @@ function fillData(resultarray, base, where) {
     var newline = new Object(); // create an new base object for each iteration
     newline     = base;
 
-    var place = (searchPersonByName(resultarray[i][0], final));
+    var place = (searchPersonByName(resultarray[i][where["fullname"]], final));
     if(place > -1) // if are already in the final array
     {
       //filter Addresses
