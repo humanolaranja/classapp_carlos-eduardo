@@ -1,18 +1,11 @@
-/**
- * @author Carlos Eduardo (Humano Laranja) <contato.carlos@outlook.com>
- */
-
-// dependencies
 const fs        = require('fs');
 const parse     = require('csv-parse');
 const PNF       = require('google-libphonenumber').PhoneNumberFormat;
 const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
+const _         = require('lodash');
+const input     = './files/input.csv';
 
-const input = './files/input.csv'; // define input dir
-
-var index = 0; // define index to csv line
-var resultarray = new Array(); // array to put the result
-var base = ''; // init base var
+var index = 0; resultarray = new Array(); var base = '';
 
 fs.createReadStream(input)
   .pipe(parse({delimiter: ','}))
@@ -31,11 +24,10 @@ fs.createReadStream(input)
   .on('end',function() {
     var final = fillData(resultarray, base, where); // call function to fill all data based on base json
     fs.writeFile('./files/output.json', JSON.stringify(final, null, 2), function(err) {
-      if(err) {
+      if(err)
         console.log(err);
-      } else {
+      else
         console.log("JSON saved into ./files/output.json");
-      }
     });
   });
 
@@ -52,15 +44,12 @@ function getBase(header) {
   for(let i = 0; i < header.length; i++)
   {
     if(header[i].includes('email') || header[i].includes('phone')) {
-      if(!('addresses' in obj)){
+      if(!('addresses' in obj))
         obj['addresses'] = new Array(); //init address
-      }
-      if(header[i].includes('email')) { // define type
+      if(header[i].includes('email'))
         var type = 'email';
-      }
-      else {
+      else
         var type = 'phone';
-      }
       header[i] = header[i].replace('email ', ''); //remove the type in the string
       header[i] = header[i].replace('phone ', ''); //remove the type in the string
       header[i] = header[i].split(', ');
@@ -103,33 +92,25 @@ function getWhere(header) {
       if(header[i].includes('email')) {
         where["emails"].push(i);
       }
-      else{
+      else {
         where["phones"].push(i);
       }
     }
-    else{
+    else {
       switch (header[i]) {
         case 'class':
-          where["classes"].push(i);
-          break;
+          where["classes"].push(i); break;
         case 'eid':
-          where["eid"] = i;
-          break;
+          where["eid"] = i; break;
         case 'fullname':
-          where["fullname"] = i;
-          break;
+          where["fullname"] = i; break;
         case 'invisible':
-          where["invisible"] = i;
-          break;
+          where["invisible"] = i; break;
         case 'see_all':
-          where["see_all"] = i;
-          break;
-        default:
-          console.log("Erro: Entre em contato com o suporte");
+          where["see_all"] = i; break;
       }
     }
   }
-
   return where;
 }
 
@@ -141,9 +122,7 @@ function getWhere(header) {
  * @return {object} the base json filled with data
  */
 function fillData(resultarray, base, where) {
-
   var final = new Array(); // create an array to put all data
-
   for(let i = 0; i < resultarray.length; i++) {
     var newline = new Object(); // create an new base object for each iteration
     newline     = base;
@@ -190,21 +169,18 @@ function fillData(resultarray, base, where) {
         resultarray[i][where["classes"][j]]                = resultarray[i][where["classes"][j]].split(' / ').join(',').split(', '); // separate classes if has / or ,
         temp.push(resultarray[i][where["classes"][j]]);
       }
-      temp = temp.flat();
-      temp                             = temp.filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
-      for (let i = 0; i < temp.length; i++) {
+      temp  = _.flattenDeep(temp);
+      temp  = temp.filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
+      for (let i = 0; i < temp.length; i++)
         final[place]["classes"].push(temp[i]);
-      }
 
       //put the invisible
-      if((final[place]["invisible"] == false) && (resultarray[i][where["invisible"]] == '1' || resultarray[i][where["invisible"]] == 'yes' || resultarray[i][where["invisible"]] == true)) {
+      if((final[place]["invisible"] == false) && (resultarray[i][where["invisible"]] == '1' || resultarray[i][where["invisible"]] == 'yes' || resultarray[i][where["invisible"]] == true))
         final[place]["invisible"]   = true // put the invisible into array
-      }
 
       //filter see_all
-      if((final[place]["see_all"] == false) && (resultarray[i][where["see_all"]] == '1' || resultarray[i][where["see_all"]] == 'yes' || resultarray[i][where["see_all"]] == true)) {
+      if((final[place]["see_all"] == false) && (resultarray[i][where["see_all"]] == '1' || resultarray[i][where["see_all"]] == 'yes' || resultarray[i][where["see_all"]] == true))
         final[place]["see_all"]   = true // put the invisible into array
-      }
     }
     else {
       // put name and eid
@@ -223,17 +199,14 @@ function fillData(resultarray, base, where) {
           if(filterAddress('email', resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
             var hasAddress = searchAddress(resultarray[i][where['emails'][countWhereEmail]], newline["addresses"]); // verify if the address already exists
             if(hasAddress) {
-              for (let i = 0; i < newline["addresses"][j]["tags"].length; i++) {
+              for (let i = 0; i < newline["addresses"][j]["tags"].length; i++)
                 newline["addresses"][hasAddress]["tags"].push(newline["addresses"][j]["tags"][i]); // just put all tags together
-              }
             }
-            else {
+            else
               newline["addresses"][j].address = resultarray[i][where['emails'][countWhereEmail]]; // // put the address into array
-            }
           }
-          else {
+          else
             newline["addresses"][j].address = ''; // set address as null
-          }
           countWhereEmail++;
         }
       }
@@ -244,36 +217,29 @@ function fillData(resultarray, base, where) {
         resultarray[i][where["classes"][j]] = resultarray[i][where["classes"][j]].split(' / ').join(',').split(','); // separate classes if has / or ,
         newline["classes"].push(resultarray[i][where["classes"][j]]);
       }
-      newline["classes"] = newline["classes"].flat();
-      newline["classes"]               = newline["classes"].filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
+      newline["classes"]    = _.flattenDeep(newline["classes"]);
+      newline["classes"]    = newline["classes"].filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
       if(newline["classes"].length == 1) {
-        newline["classes"] = newline["classes"][0];
+        newline["classes"]  = newline["classes"][0];
       }
 
       //filter the invisible
-      if(resultarray[i][where["invisible"]] == '' || resultarray[i][where["invisible"]] == '0' || resultarray[i][where["invisible"]] == 'no') {
+      if(resultarray[i][where["invisible"]] == '' || resultarray[i][where["invisible"]] == '0' || resultarray[i][where["invisible"]] == 'no')
         newline["invisible"]             = false // put the invisible into array
-      }
-      else {
+      else
         newline["invisible"]             = true // put the invisible into array
-      }
 
       //filter see_all
-      if(resultarray[i][where["see_all"]] == '' || resultarray[i][where["see_all"]] == '0' || resultarray[i][where["see_all"]] == 'no') {
+      if(resultarray[i][where["see_all"]] == '' || resultarray[i][where["see_all"]] == '0' || resultarray[i][where["see_all"]] == 'no')
         newline["see_all"]               = false // put the invisible into array
-      }
-      else {
+      else
         newline["see_all"]               = true // put the invisible into array
-      }
 
       var json = JSON.stringify(newline); // convert into string json
-      var json = JSON.parse(json); // convert into object json
-      final.push(json); // put this json into final array
+      final.push(JSON.parse(json)); // put this json into final array
     }
   }
-  // remove all null address in the last iteration
-  final = removeAllNullAddress(final);
-
+  final = removeAllNullAddress(final); // remove all null address in the last iteration
   return final;
 }
 
@@ -284,11 +250,9 @@ function fillData(resultarray, base, where) {
  * @return {integer} the index found, or -1 if not found
  */
 function searchPersonByName(name, final) {
-  for(let i = 0; i < Object.keys(final).length; i++) {
-    if(final[i]["fullname"] == name) {
+  for(let i = 0; i < Object.keys(final).length; i++)
+    if(final[i]["fullname"] == name)
       return i;
-    }
-  }
   return -1;
 }
 
@@ -299,21 +263,16 @@ function searchPersonByName(name, final) {
  * @return {mixed} the number filtered or -1 if not valid
  */
 function filterTel(number) {
-  try {
-    number = phoneUtil.parse(number, 'BR');
-  }
-  catch(err) {
-    number = phoneUtil.parse('123', 'BR');
-  }
-
+  try
+    { number = phoneUtil.parse(number, 'BR'); }
+  catch(err)
+    { return false; }
   if(phoneUtil.isValidNumberForRegion(number, 'BR')) {
-    number = phoneUtil.format(number, PNF.E164); // format the number
-    number = number.slice(1); // remove the plus sign
+    number = phoneUtil.format(number, PNF.E164).slice(1); // format the number
     return number;
   }
-  else {
+  else
     return false;
-  }
 }
 
 /**
@@ -329,27 +288,16 @@ function validateEmail(email)
 
 /**
   * a function to remove all objects that has null address
-  * @param {array} array - array to revove objects
+  * @param {array} array - array to remove objects
   * @return {array} new array with no null addresses
   */
 function removeAllNullAddress(array) {
-  for (let i = 0; i < array.length; i++) {
-    for (let j = 0; j < array[i]["addresses"].length; j++) {
-      if((array[i]["addresses"][j]["address"]) == '') {
-        array[i]["addresses"][j] = ''; // set all null address as null in addresses
-      }
-    }
-  }
-
-  for (let i = 0; i < array.length; i++) {
-    for (var j = 0; j < array[i]["addresses"].length; j++) {
-      if((array[i]["addresses"][j]) == '' || (array[i]["addresses"][j]) == null) {
+  for (let i = 0; i < array.length; i++)
+    for (var j = 0; j < array[i]["addresses"].length; j++)
+      if((array[i]["addresses"][j]["address"]) == '' || (array[i]["addresses"][j]["address"]) == null || (array[i]["addresses"][j]["address"]) == false) {
         array[i]["addresses"].splice(j, 1); // remove all null content un addresses
         j = -1; // start searching again, because now the array size is different
       }
-    }
-  }
-
   return array;
 }
 
@@ -361,12 +309,9 @@ function removeAllNullAddress(array) {
  * @return {mixed} index if found, false if not found
  */
 function searchAddress(address, addresses)  {
-  for (var i = 0; i < addresses.length; i++) {
+  for (var i = 0; i < addresses.length; i++)
     if(addresses[i].address == address)
-    {
       return i;
-    }
-  }
   return false;
 }
 
@@ -384,11 +329,3 @@ function filterAddress(type, content)  {
       return validateEmail(content);
   }
 }
-
-Object.defineProperty(Array.prototype, 'flat', {
-  value: function(depth = 1) {
-    return this.reduce(function (flat, toFlatten) {
-      return flat.concat((Array.isArray(toFlatten) && (depth-1)) ? toFlatten.flat(depth-1) : toFlatten);
-    }, []);
-  }
-});
