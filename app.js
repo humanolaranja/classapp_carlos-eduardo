@@ -88,26 +88,18 @@ function getWhere(header) {
 
   for(let i = 0; i < header.length; i++)
   {
-    if(header[i].includes('email') || header[i].includes('phone')) {
-      if(header[i].includes('email')) {
-        where["emails"].push(i);
-      }
-      else {
-        where["phones"].push(i);
-      }
+    if(header[i].includes('email')) {
+      where["emails"].push(i);
+    }
+    else if(header[i].includes('phone')){
+      where["phones"].push(i);
     }
     else {
-      switch (header[i]) {
-        case 'class':
-          where["classes"].push(i); break;
-        case 'eid':
-          where["eid"] = i; break;
-        case 'fullname':
-          where["fullname"] = i; break;
-        case 'invisible':
-          where["invisible"] = i; break;
-        case 'see_all':
-          where["see_all"] = i; break;
+      if(header[i] == 'class') {
+        where["classes"].push(i);
+      }
+      else {
+        where[header[i]] = i;
       }
     }
   }
