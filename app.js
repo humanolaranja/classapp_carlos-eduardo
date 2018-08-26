@@ -75,27 +75,19 @@ function getBase(header) {
  * @return {array} the where array
  */
 function getWhere(header) {
-  var where = new Array();
-  where["classes"] = new Array();
-  where["emails"] = new Array();
-  where["phones"] = new Array();
-
-  for(let i = 0; i < header.length; i++)
-  {
-    if(header[i].includes('email')) {
+  var where         = new Array();
+  where["classes"]  = new Array();
+  where["emails"]   = new Array();
+  where["phones"]   = new Array();
+  for(let i = 0; i < header.length; i++) {
+    if(header[i].includes('email'))
       where["emails"].push(i);
-    }
-    else if(header[i].includes('phone')){
+    else if(header[i].includes('phone'))
       where["phones"].push(i);
-    }
-    else {
-      if(header[i] == 'class') {
+    else if(header[i] == 'class')
         where["classes"].push(i);
-      }
-      else {
+      else
         where[header[i]] = i;
-      }
-    }
   }
   return where;
 }
@@ -249,8 +241,7 @@ function filterTel(number) {
     return false;
 }
 
-function validateEmail(email)
-{
+function validateEmail(email) {
   var re = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
   return re.test(email);
 }
