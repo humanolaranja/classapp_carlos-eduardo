@@ -174,11 +174,11 @@ const fillAddresses = (newline, resultarray, where) => {
   var countWherePhone = 0;
   var countWhereEmail = 0;
   for (let j = 0; j < newline.length; j++) {
-    if(newline[j].type == 'phone'){
+    if(newline[j].type == 'phone') {
       newline[j].address = filterTel(resultarray[where['phones'][countWherePhone]]);
       countWherePhone++;
     }
-    else{
+    else {
       if(validateEmail(resultarray[where['emails'][countWhereEmail]])) { // if is an valid email
         var hasAddress = searchAddress(resultarray[where['emails'][countWhereEmail]], newline); // verify if the address already exists
         if(hasAddress) {
@@ -202,7 +202,7 @@ const appendAddresses = (newline, resultarray, where) => {
   var countWhereEmail = 0;
   for (let j = 0; j < newline.length; j++) {
     var newobject = new Object(JSON.parse(JSON.stringify(newline[j]))); // use this object but not with reference
-    if(newline[j].type == 'phone'){
+    if(newline[j].type == 'phone') {
       newobject.address = filterTel(resultarray[where['phones'][countWherePhone]]); // put the address
       temp.push(newobject); // put into addresses
       countWherePhone++;
