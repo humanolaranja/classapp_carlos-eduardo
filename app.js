@@ -96,73 +96,20 @@ const fillData = (resultarray, base, where) => {
   for(let i = 0; i < resultarray.length; i++) {
     var newline = new Object(); // create an new base object for each iteration
     newline     = base;
-
     var place = (searchPersonByName(resultarray[i][where["fullname"]], final));
-    if(place > -1) { // if are already in the final array
-      //filter Addresses
-      var countWherePhone = 0;
-      var countWhereEmail = 0;
-      for (let j = 0; j < newline["addresses"].length; j++) {
-        var newobject = new Object(); // create new object
-        newobject = JSON.parse(JSON.stringify(newline["addresses"][j])); // use this object but not with reference
-        if(newline["addresses"][j].type == 'phone'){
-          newobject.address = filterTel(resultarray[i][where['phones'][countWherePhone]]); // put the address
-          final[place]["addresses"].push(newobject); // put into addresses
-          countWherePhone++;
-        }
-        else {
-          var emails = resultarray[i][where['emails'][countWhereEmail]].split('/'); // separate emails if has /
-          if(emails.length > 1) {
-            for (let i = 0; i < emails.length; i++) {
-              if(validateEmail(emails[i])) {
-                var newobject = new Object(); // create new object
-                newobject = JSON.parse(JSON.stringify(newline["addresses"][j])); // use this object but not with reference
-                newobject.address = emails[i]; // put the address
-                final[place]["addresses"].push(newobject); // put into addresses
-              }
-            }
-          }
-          else {
-            if(validateEmail(resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
-              newobject.address = resultarray[i][where['emails'][countWhereEmail]]; // put the address
-              final[place]["addresses"].push(newobject); // put into addresses
-            }
-          }
-          countWhereEmail++;
-        }
-      }
+    if(place > -1) {
+      final[place]["addresses"] = _.concat(final[place]["addresses"], appendAddresses(newline["addresses"], resultarray[i], where));
       final[place]["classes"]   = _.concat(final[place]["classes"], fillClasses(resultarray[i], where["classes"]));
       final[place]["invisible"] = trueOrFalse(final[place]["invisible"], resultarray[i][where["invisible"]]);
       final[place]["see_all"]   = trueOrFalse(final[place]["see_all"], resultarray[i][where["see_all"]]);
     }
     else {
-      newline["fullname"]              = resultarray[i][where["fullname"]]; // put the name into array
-      newline["eid"]                   = resultarray[i][where["eid"]]; // put the eid into array
-      var countWherePhone = 0;
-      var countWhereEmail = 0;
-      for (let j = 0; j < newline["addresses"].length; j++) {
-        if(newline["addresses"][j].type == 'phone'){
-          newline["addresses"][j].address = filterTel(resultarray[i][where['phones'][countWherePhone]]);
-          countWherePhone++;
-        }
-        else{
-          if(validateEmail(resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
-            var hasAddress = searchAddress(resultarray[i][where['emails'][countWhereEmail]], newline["addresses"]); // verify if the address already exists
-            if(hasAddress) {
-              for (let i = 0; i < newline["addresses"][j]["tags"].length; i++)
-                newline["addresses"][hasAddress]["tags"].push(newline["addresses"][j]["tags"][i]); // just put all tags together
-            }
-            else
-              newline["addresses"][j].address = resultarray[i][where['emails'][countWhereEmail]]; // // put the address into array
-          }
-          else
-            newline["addresses"][j].address = ''; // set address as null
-          countWhereEmail++;
-        }
-      }
+      newline["fullname"]  = resultarray[i][where["fullname"]]; // put the name into array
+      newline["eid"]       = resultarray[i][where["eid"]]; // put the eid into array
+      newline["addresses"] = fillAddresses(newline["addresses"], resultarray[i], where);
       newline["classes"]   = fillClasses(resultarray[i], where["classes"]);
-      newline['invisible'] = initTrueFalse(resultarray[i][where["invisible"]]);
-      newline['see_all']   = initTrueFalse(resultarray[i][where["see_all"]]);
+      newline['invisible'] = trueOrFalse(resultarray[i][where["invisible"]]);
+      newline['see_all']   = trueOrFalse(resultarray[i][where["see_all"]]);
 
       var json = JSON.stringify(newline); // convert into string json
       final.push(JSON.parse(json)); // put this json into final array
@@ -213,16 +160,14 @@ const searchAddress = (address, addresses) => {
   return false;
 }
 
-const trueOrFalse = (final, current) => {
+const trueOrFalse = (final, current = false) => {
+  if(final == '' || final == '0' || final == 'no')
+    final = false;
+  else
+    final = true;
   if((final == false) && (current == '1' || current == 'yes' || current == true))
     return true;
   return final;
-}
-
-const initTrueFalse = (final) => {
-  if(final == '' || final == '0' || final == 'no')
-    return false;
-  return true;
 }
 
 const fillClasses = (resultarray, where) => {
@@ -234,4 +179,58 @@ const fillClasses = (resultarray, where) => {
   array = _.flattenDeep(array).filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
   if(array.length == 1) array  = array[0];
   return array;
+}
+
+const fillAddresses = (newline, resultarray, where) => {
+  var countWherePhone = 0;
+  var countWhereEmail = 0;
+  for (let j = 0; j < newline.length; j++) {
+    if(newline[j].type == 'phone'){
+      newline[j].address = filterTel(resultarray[where['phones'][countWherePhone]]);
+      countWherePhone++;
+    }
+    else{
+      if(validateEmail(resultarray[where['emails'][countWhereEmail]])) { // if is an valid email
+        var hasAddress = searchAddress(resultarray[where['emails'][countWhereEmail]], newline); // verify if the address already exists
+        if(hasAddress) {
+          for (let i = 0; i < newline[j]["tags"].length; i++)
+            newline[hasAddress]["tags"].push(newline[j]["tags"][i]); // just put all tags together
+        }
+        else
+          newline[j].address = resultarray[where['emails'][countWhereEmail]]; // // put the address into array
+      }
+      else
+        newline[j].address = ''; // set address as null
+      countWhereEmail++;
+    }
+  }
+  return newline;
+}
+
+const appendAddresses = (newline, resultarray, where) => {
+  var temp = new Array();
+  var countWherePhone = 0;
+  var countWhereEmail = 0;
+  for (let j = 0; j < newline.length; j++) {
+    var newobject = new Object(); // create new object
+    newobject = JSON.parse(JSON.stringify(newline[j])); // use this object but not with reference
+    if(newline[j].type == 'phone'){
+      newobject.address = filterTel(resultarray[where['phones'][countWherePhone]]); // put the address
+      temp.push(newobject); // put into addresses
+      countWherePhone++;
+    }
+    else {
+      var emails = resultarray[where['emails'][countWhereEmail]].split('/'); // separate emails if has /
+        for (let i = 0; i < emails.length; i++) {
+          if(validateEmail(emails[i])) {
+            var newobject = new Object(); // create new object
+            newobject = JSON.parse(JSON.stringify(newline[j])); // use this object but not with reference
+            newobject.address = emails[i]; // put the address
+            temp.push(newobject); // put into addresses
+          }
+        }
+      countWhereEmail++;
+    }
+  }
+  return temp;
 }
