@@ -98,8 +98,7 @@ const fillData = (resultarray, base, where) => {
     newline     = base;
 
     var place = (searchPersonByName(resultarray[i][where["fullname"]], final));
-    if(place > -1) // if are already in the final array
-    {
+    if(place > -1) { // if are already in the final array
       //filter Addresses
       var countWherePhone = 0;
       var countWhereEmail = 0;
@@ -144,13 +143,8 @@ const fillData = (resultarray, base, where) => {
       for (let i = 0; i < temp.length; i++)
         final[place]["classes"].push(temp[i]);
 
-      //put the invisible
-      if((final[place]["invisible"] == false) && (resultarray[i][where["invisible"]] == '1' || resultarray[i][where["invisible"]] == 'yes' || resultarray[i][where["invisible"]] == true))
-        final[place]["invisible"]   = true // put the invisible into array
-
-      //filter see_all
-      if((final[place]["see_all"] == false) && (resultarray[i][where["see_all"]] == '1' || resultarray[i][where["see_all"]] == 'yes' || resultarray[i][where["see_all"]] == true))
-        final[place]["see_all"]   = true // put the invisible into array
+      final[place]["invisible"] = trueOrFalse(final[place]["invisible"], resultarray[i][where["invisible"]]);
+      final[place]["see_all"] = trueOrFalse(final[place]["see_all"], resultarray[i][where["see_all"]]);
     }
     else {
       // put name and eid
@@ -193,17 +187,8 @@ const fillData = (resultarray, base, where) => {
         newline["classes"]  = newline["classes"][0];
       }
 
-      //filter the invisible
-      if(resultarray[i][where["invisible"]] == '' || resultarray[i][where["invisible"]] == '0' || resultarray[i][where["invisible"]] == 'no')
-        newline["invisible"]             = false // put the invisible into array
-      else
-        newline["invisible"]             = true // put the invisible into array
-
-      //filter see_all
-      if(resultarray[i][where["see_all"]] == '' || resultarray[i][where["see_all"]] == '0' || resultarray[i][where["see_all"]] == 'no')
-        newline["see_all"]               = false // put the invisible into array
-      else
-        newline["see_all"]               = true // put the invisible into array
+      newline['invisible'] = initTrueFalse(resultarray[i][where["invisible"]]);
+      newline['see_all']   = initTrueFalse(resultarray[i][where["see_all"]]);
 
       var json = JSON.stringify(newline); // convert into string json
       final.push(JSON.parse(json)); // put this json into final array
@@ -253,4 +238,16 @@ const searchAddress = (address, addresses) => {
     if(addresses[i].address == address)
       return i;
   return false;
+}
+
+const trueOrFalse = (final, current) => {
+  if((final == false) && (current == '1' || current == 'yes' || current == true))
+    return true;
+  return final;
+}
+
+const initTrueFalse = (final) => {
+  if(final == '' || final == '0' || final == 'no')
+    return false;
+  return true;
 }
