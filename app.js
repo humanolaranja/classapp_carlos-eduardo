@@ -35,7 +35,7 @@ fs.createReadStream(input)
  * @param {array} header - the header array
  * @return {object} the base json
  */
-function getBase(header) {
+const getBase = (header) => {
   var obj = new Object(); // grant that each var is an different object
   for(let i = 0; i < header.length; i++) {
     var addressobj = new Object();
@@ -66,7 +66,7 @@ function getBase(header) {
  * @param {array} header - the header array
  * @return {array} the where array
  */
-function getWhere(header) {
+const getWhere = (header) => {
   var where         = new Array();
   where["classes"]  = new Array();
   where["emails"]   = new Array();
@@ -91,7 +91,7 @@ function getWhere(header) {
  * @param {array} where - the array to know where columns are
  * @return {object} the base json filled with data
  */
-function fillData(resultarray, base, where) {
+const fillData = (resultarray, base, where) => {
   var final = new Array(); // create an array to put all data
   for(let i = 0; i < resultarray.length; i++) {
     var newline = new Object(); // create an new base object for each iteration
@@ -213,14 +213,14 @@ function fillData(resultarray, base, where) {
   return final;
 }
 
-function searchPersonByName(name, final) {
+const searchPersonByName = (name, final) => {
   for(let i = 0; i < Object.keys(final).length; i++)
     if(final[i]["fullname"] == name)
       return i;
   return -1;
 }
 
-function filterTel(number) {
+const filterTel = (number) => {
   try
     { number = phoneUtil.parse(number, 'BR'); }
   catch(err)
@@ -233,12 +233,12 @@ function filterTel(number) {
     return false;
 }
 
-function validateEmail(email) {
+const validateEmail = (email) => {
   var re = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
   return re.test(email);
 }
 
-function removeAllNullAddress(array) {
+const removeAllNullAddress = (array) => {
   for (let i = 0; i < array.length; i++)
     for (var j = 0; j < array[i]["addresses"].length; j++)
       if((array[i]["addresses"][j]["address"]) == '' || (array[i]["addresses"][j]["address"]) == null || (array[i]["addresses"][j]["address"]) == false) {
@@ -248,7 +248,7 @@ function removeAllNullAddress(array) {
   return array;
 }
 
-function searchAddress(address, addresses)  {
+const searchAddress = (address, addresses) => {
   for (var i = 0; i < addresses.length; i++)
     if(addresses[i].address == address)
       return i;
