@@ -131,20 +131,9 @@ const fillData = (resultarray, base, where) => {
           countWhereEmail++;
         }
       }
-
-      // put all classes
-      var temp = Array();
-      for (let j = 0; j < where["classes"].length; j++) {
-        resultarray[i][where["classes"][j]]                = resultarray[i][where["classes"][j]].split(' / ').join(',').split(', '); // separate classes if has / or ,
-        temp.push(resultarray[i][where["classes"][j]]);
-      }
-      temp  = _.flattenDeep(temp);
-      temp  = temp.filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
-      for (let i = 0; i < temp.length; i++)
-        final[place]["classes"].push(temp[i]);
-
+      final[place]["classes"]   = _.concat(final[place]["classes"], fillClasses(resultarray[i], where["classes"]));
       final[place]["invisible"] = trueOrFalse(final[place]["invisible"], resultarray[i][where["invisible"]]);
-      final[place]["see_all"] = trueOrFalse(final[place]["see_all"], resultarray[i][where["see_all"]]);
+      final[place]["see_all"]   = trueOrFalse(final[place]["see_all"], resultarray[i][where["see_all"]]);
     }
     else {
       newline["fullname"]              = resultarray[i][where["fullname"]]; // put the name into array
@@ -239,7 +228,7 @@ const initTrueFalse = (final) => {
 const fillClasses = (resultarray, where) => {
   var array = new Array();
   for (let j = 0; j < where.length; j++) {
-    resultarray[where[j]] = resultarray[where[j]].split(' / ').join(',').split(','); // separate classes if has / or ,
+    resultarray[where[j]] = resultarray[where[j]].split(' /').join(',').split(', '); // separate classes if has / or ,
     array.push(resultarray[where[j]]);
   }
   array = _.flattenDeep(array).filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
