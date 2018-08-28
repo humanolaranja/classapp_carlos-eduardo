@@ -37,33 +37,26 @@ fs.createReadStream(input)
  */
 function getBase(header) {
   var obj = new Object(); // grant that each var is an different object
-  for(let i = 0; i < header.length; i++)
-  {
+  for(let i = 0; i < header.length; i++) {
+    var addressobj = new Object();
     if(header[i].includes('email') || header[i].includes('phone')) {
       if(!('addresses' in obj))
         obj['addresses'] = new Array(); //init address
       if(header[i].includes('email'))
-        var type = 'email';
+        addressobj.type = 'email';
       else
-        var type = 'phone';
+        addressobj.type = 'phone';
       header[i] = header[i].replace('email ', '').replace('phone ', ''); //remove the type in the string
-      header[i] = header[i].split(', ');
-
-      var addressobj = new Object();
-      addressobj.type = type;
-      addressobj.tags = header[i];
+      addressobj.tags = header[i].split(', ');
       addressobj.address = '';
-
       obj["addresses"].push(addressobj);
     }
     else if(header[i] == 'class') {
-      if(!('classes' in obj)){
+      if(!('classes' in obj))
         obj['classes'] = new Array(); // put the prop in the object
-      }
     }
-    else {
+    else
       obj[header[i]] = ''; // put the prop in the object
-    }
   }
   return obj;
 }
