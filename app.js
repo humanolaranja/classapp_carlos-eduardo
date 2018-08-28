@@ -84,18 +84,10 @@ const getWhere = (header) => {
   return where;
 }
 
-/**
- * a function that returns the base json filled with content
- * @param {array} resultarray - the harray that contains all data
- * @param {array} base - the json to use as base
- * @param {array} where - the array to know where columns are
- * @return {object} the base json filled with data
- */
 const fillData = (resultarray, base, where) => {
   var final = new Array(); // create an array to put all data
   for(let i = 0; i < resultarray.length; i++) {
-    var newline = new Object(); // create an new base object for each iteration
-    newline     = base;
+    var newline = new Object(base); // create an new base object for each iteration
     var place = (searchPersonByName(resultarray[i][where["fullname"]], final));
     if(place > -1) {
       final[place]["addresses"] = _.concat(final[place]["addresses"], appendAddresses(newline["addresses"], resultarray[i], where));
@@ -110,13 +102,11 @@ const fillData = (resultarray, base, where) => {
       newline["classes"]   = fillClasses(resultarray[i], where["classes"]);
       newline['invisible'] = trueOrFalse(resultarray[i][where["invisible"]]);
       newline['see_all']   = trueOrFalse(resultarray[i][where["see_all"]]);
-
       var json = JSON.stringify(newline); // convert into string json
       final.push(JSON.parse(json)); // put this json into final array
     }
   }
-  final = removeAllNullAddress(final); // remove all null address in the last iteration
-  return final;
+  return final = removeAllNullAddress(final); // remove all null address in the last iteration
 }
 
 const searchPersonByName = (name, final) => {
