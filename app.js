@@ -147,11 +147,8 @@ const fillData = (resultarray, base, where) => {
       final[place]["see_all"] = trueOrFalse(final[place]["see_all"], resultarray[i][where["see_all"]]);
     }
     else {
-      // put name and eid
       newline["fullname"]              = resultarray[i][where["fullname"]]; // put the name into array
       newline["eid"]                   = resultarray[i][where["eid"]]; // put the eid into array
-
-      //filter Addresses
       var countWherePhone = 0;
       var countWhereEmail = 0;
       for (let j = 0; j < newline["addresses"].length; j++) {
@@ -174,19 +171,7 @@ const fillData = (resultarray, base, where) => {
           countWhereEmail++;
         }
       }
-
-      newline["classes"] = Array();
-      // filter classes
-      for (let j = 0; j < where["classes"].length; j++) {
-        resultarray[i][where["classes"][j]] = resultarray[i][where["classes"][j]].split(' / ').join(',').split(','); // separate classes if has / or ,
-        newline["classes"].push(resultarray[i][where["classes"][j]]);
-      }
-      newline["classes"]    = _.flattenDeep(newline["classes"]);
-      newline["classes"]    = newline["classes"].filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
-      if(newline["classes"].length == 1) {
-        newline["classes"]  = newline["classes"][0];
-      }
-
+      newline["classes"]   = fillClasses(resultarray[i], where["classes"]);
       newline['invisible'] = initTrueFalse(resultarray[i][where["invisible"]]);
       newline['see_all']   = initTrueFalse(resultarray[i][where["see_all"]]);
 
@@ -214,8 +199,7 @@ const filterTel = (number) => {
     number = phoneUtil.format(number, PNF.E164).slice(1); // format the number
     return number;
   }
-  else
-    return false;
+  return false;
 }
 
 const validateEmail = (email) => {
@@ -250,4 +234,15 @@ const initTrueFalse = (final) => {
   if(final == '' || final == '0' || final == 'no')
     return false;
   return true;
+}
+
+const fillClasses = (resultarray, where) => {
+  var array = new Array();
+  for (let j = 0; j < where.length; j++) {
+    resultarray[where[j]] = resultarray[where[j]].split(' / ').join(',').split(','); // separate classes if has / or ,
+    array.push(resultarray[where[j]]);
+  }
+  array = _.flattenDeep(array).filter(function(e){ return e.replace(/(\r\n|\n|\r)/gm,"")}); // remove empty values from array
+  if(array.length == 1) array  = array[0];
+  return array;
 }
