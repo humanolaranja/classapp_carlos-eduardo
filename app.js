@@ -46,8 +46,7 @@ function getBase(header) {
         var type = 'email';
       else
         var type = 'phone';
-      header[i] = header[i].replace('email ', ''); //remove the type in the string
-      header[i] = header[i].replace('phone ', ''); //remove the type in the string
+      header[i] = header[i].replace('email ', '').replace('phone ', ''); //remove the type in the string
       header[i] = header[i].split(', ');
 
       var addressobj = new Object();
@@ -115,7 +114,7 @@ function fillData(resultarray, base, where) {
         var newobject = new Object(); // create new object
         newobject = JSON.parse(JSON.stringify(newline["addresses"][j])); // use this object but not with reference
         if(newline["addresses"][j].type == 'phone'){
-          newobject.address = filterAddress('phone', resultarray[i][where['phones'][countWherePhone]]); // put the address
+          newobject.address = filterTel(resultarray[i][where['phones'][countWherePhone]]); // put the address
           final[place]["addresses"].push(newobject); // put into addresses
           countWherePhone++;
         }
@@ -170,11 +169,11 @@ function fillData(resultarray, base, where) {
       var countWhereEmail = 0;
       for (let j = 0; j < newline["addresses"].length; j++) {
         if(newline["addresses"][j].type == 'phone'){
-          newline["addresses"][j].address = filterAddress('phone', resultarray[i][where['phones'][countWherePhone]]);
+          newline["addresses"][j].address = filterTel(resultarray[i][where['phones'][countWherePhone]]);
           countWherePhone++;
         }
         else{
-          if(filterAddress('email', resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
+          if(validateEmail(resultarray[i][where['emails'][countWhereEmail]])) { // if is an valid email
             var hasAddress = searchAddress(resultarray[i][where['emails'][countWhereEmail]], newline["addresses"]); // verify if the address already exists
             if(hasAddress) {
               for (let i = 0; i < newline["addresses"][j]["tags"].length; i++)
@@ -250,7 +249,7 @@ function removeAllNullAddress(array) {
   for (let i = 0; i < array.length; i++)
     for (var j = 0; j < array[i]["addresses"].length; j++)
       if((array[i]["addresses"][j]["address"]) == '' || (array[i]["addresses"][j]["address"]) == null || (array[i]["addresses"][j]["address"]) == false) {
-        array[i]["addresses"].splice(j, 1); // remove all null content un addresses
+        array[i]["addresses"].splice(j, 1); // remove all null content in addresses
         j = -1; // start searching again, because now the array size is different
       }
   return array;
@@ -261,13 +260,4 @@ function searchAddress(address, addresses)  {
     if(addresses[i].address == address)
       return i;
   return false;
-}
-
-function filterAddress(type, content)  {
-  switch (type) {
-    case 'phone':
-      return filterTel(content);
-    case 'email':
-      return validateEmail(content);
-  }
 }
