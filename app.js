@@ -14,8 +14,7 @@ fs.createReadStream(input)
       base = getBase(csvrow); // get base json to fill with data
     }
     else {
-      var row = new Object(); // grant that each var is an different object
-      row = csvrow; // fill data based on base json
+      var row = new Object(csvrow); // fill data based on base json
       resultarray.push(row); // put the row into array of rows
     }
     index++; // increments index
@@ -202,8 +201,7 @@ const appendAddresses = (newline, resultarray, where) => {
   var countWherePhone = 0;
   var countWhereEmail = 0;
   for (let j = 0; j < newline.length; j++) {
-    var newobject = new Object(); // create new object
-    newobject = JSON.parse(JSON.stringify(newline[j])); // use this object but not with reference
+    var newobject = new Object(JSON.parse(JSON.stringify(newline[j]))); // use this object but not with reference
     if(newline[j].type == 'phone'){
       newobject.address = filterTel(resultarray[where['phones'][countWherePhone]]); // put the address
       temp.push(newobject); // put into addresses
@@ -213,8 +211,7 @@ const appendAddresses = (newline, resultarray, where) => {
       var emails = resultarray[where['emails'][countWhereEmail]].split('/'); // separate emails if has /
         for (let i = 0; i < emails.length; i++) {
           if(validateEmail(emails[i])) {
-            var newobject = new Object(); // create new object
-            newobject = JSON.parse(JSON.stringify(newline[j])); // use this object but not with reference
+            var newobject = new Object(JSON.parse(JSON.stringify(newline[j]))); // use this object but not with reference
             newobject.address = emails[i]; // put the address
             temp.push(newobject); // put into addresses
           }
