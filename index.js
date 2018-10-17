@@ -6,7 +6,6 @@ const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance()
 const input     = './files/input.csv';
 var data        = fs.readFileSync(input, 'utf8');
     data        = Papa.parse(data).data;
-
 const indices = (array, search) => { return array.map((e, i) => e.includes(search) ? i : '').filter(String) }
 const where = {
   fullname:   indices(data[0], 'fullname'),
@@ -74,9 +73,10 @@ const findDuplicated = (array) => {
 const merge = (array) => {
   let duplicated = findDuplicated(array);
   for (let i = duplicated.length-1; i > 0; i--) {
-    array[duplicated[i-1]].classes = array[duplicated[i-1]].classes.concat(array[duplicated[i]].classes);
-    array[duplicated[i-1]].see_all = (array[duplicated[i]].see_all != 0) ? array[duplicated[i]].see_all : array[duplicated[i-1]].see_all;
-    array[duplicated[i-1]].invisible = (array[duplicated[i]].invisible != 0) ? array[duplicated[i]].invisible : array[duplicated[i-1]].invisible;
+    array[duplicated[i-1]].classes    = array[duplicated[i-1]].classes.concat(array[duplicated[i]].classes);
+    array[duplicated[i-1]].see_all    = (array[duplicated[i]].see_all != 0) ? array[duplicated[i]].see_all : array[duplicated[i-1]].see_all;
+    array[duplicated[i-1]].invisible  = (array[duplicated[i]].invisible != 0) ? array[duplicated[i]].invisible : array[duplicated[i-1]].invisible;
+    array[duplicated[i-1]].addresses  = array[duplicated[i-1]].addresses.concat(array[duplicated[i]].addresses);
     delete array[duplicated[i]];
     array = _.reject(array, _.isEmpty);
   }
