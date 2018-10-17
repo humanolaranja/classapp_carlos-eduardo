@@ -63,9 +63,17 @@ const putEmails = (base, data, where, line) => {
         line.addresses.push(obj);
       }
     }
+    let duplicated = findDuplicatedAddress(line.addresses);
+    if(duplicated.length > 0) {
+      for (let k = duplicated.length-1; k > 0; k--) {
+        line.addresses[duplicated[k-1]].tags = line.addresses[duplicated[k-1]].tags.concat(line.addresses[duplicated[k]].tags);
+        delete line.addresses[duplicated[k]];
+        line.addresses = _.reject(line.addresses, _.isEmpty);
+      }
+    }
   }
 }
-const findDuplicated = (array) => {
+const findDuplicatedUser = (array) => {
   let duplicated = new Array;
   for (let i = 0; i < array.length; i++)
     for (let j = 0; j < array.length; j++)
@@ -73,8 +81,16 @@ const findDuplicated = (array) => {
         duplicated.push(i);
   return duplicated;
 }
+const findDuplicatedAddress = (array) => {
+  let duplicated = new Array;
+  for (let i = 0; i < array.length; i++)
+    for (let j = 0; j < array.length; j++)
+      if(array[i].address == array[j].address && i != j && (!duplicated.includes(i)))
+        duplicated.push(i);
+  return duplicated;
+}
 const merge = (array) => {
-  let duplicated = findDuplicated(array);
+  let duplicated = findDuplicatedUser(array);
   for (let i = duplicated.length-1; i > 0; i--) {
     array[duplicated[i-1]].classes    = array[duplicated[i-1]].classes.concat(array[duplicated[i]].classes);
     array[duplicated[i-1]].see_all    = (array[duplicated[i]].see_all != 0) ? array[duplicated[i]].see_all : array[duplicated[i-1]].see_all;
