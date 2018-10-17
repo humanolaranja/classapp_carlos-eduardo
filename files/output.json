@@ -12,14 +12,6 @@
     ],
     "addresses": [
       {
-        "type": "phone",
-        "tags": [
-          "Responsável",
-          "Mãe"
-        ],
-        "address": "551138839332"
-      },
-      {
         "type": "email",
         "tags": [
           "Mãe"
@@ -32,6 +24,14 @@
           "Aluno"
         ],
         "address": "johndoealuno1@gmail.com"
+      },
+      {
+        "type": "phone",
+        "tags": [
+          "Responsável",
+          "Mãe"
+        ],
+        "address": "551138839332"
       },
       {
         "type": "email",
