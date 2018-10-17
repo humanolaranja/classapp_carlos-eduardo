@@ -4,34 +4,35 @@ const _         = require('lodash');
 const PNF       = require('google-libphonenumber').PhoneNumberFormat;
 const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 const input     = './files/input.csv';
-var data        = fs.readFileSync(input, 'utf8');
-    data        = Papa.parse(data).data;
-const indices               = (array, search) => { return array.map((e, i) => e.includes(search) ? i : '').filter(String) }
-const where                 = {
-  fullname:   indices(data[0], 'fullname'),
-  eid:        indices(data[0], 'eid'),
-  classes:    indices(data[0], 'class'),
-  emails:     indices(data[0], 'email'),
-  phones:     indices(data[0], 'phone'),
-  invisible:  indices(data[0], 'invisible'),
-  see_all:    indices(data[0], 'see_all')
+var   data      = fs.readFileSync(input, 'utf8');
+      data      = Papa.parse(data).data;
+const header    = data[0];
+const indices                 = (array, search) => { return array.map((e, i) => e.includes(search) ? i : '').filter(String) }
+const where                   = {
+  fullname:   indices(header, 'fullname'),
+  eid:        indices(header, 'eid'),
+  classes:    indices(header, 'class'),
+  emails:     indices(header, 'email'),
+  phones:     indices(header, 'phone'),
+  invisible:  indices(header, 'invisible'),
+  see_all:    indices(header, 'see_all')
 }
-const base                  = () =>  { return {fullname:'', eid:'', classes:[], addresses:[], invisible:'', see_all:'' } }
-const validateEmail         = (email) => { return /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(email) }
-const validatePhone         = (number) => {
+const base                    = () =>  { return {fullname:'', eid:'', classes:[], addresses:[], invisible:'', see_all:'' } }
+const validateEmail           = (email) => { return /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(email) }
+const validatePhone           = (number) => {
   try { number = phoneUtil.parse(number, 'BR') }
   catch(err) { return false }
   if(phoneUtil.isValidNumberForRegion(number, 'BR'))
     return phoneUtil.format(number, PNF.E164).slice(1); // format the number
   return false;
 }
-const putBasics             = (data, where, line) => {
+const putBasics               = (data, where, line) => {
   line.fullname   = data[where.fullname];
   line.eid        = data[where.eid];
   line.invisible  = (data[where.invisible] == '' || data[where.invisible] == 0|| data[where.invisible] == 'no') ? false : (!!data[where.invisible]);
   line.see_all    = (data[where.see_all] == '' || data[where.see_all] == 0 || data[where.see_all] == 'no') ? false : (!!data[where.see_all]);;
 }
-const putClasses            = (data, where, line) => {
+const putClasses              = (data, where, line) => {
   for (let j = 0; j < where.classes.length; j++) {
     data[where.classes[j]] = data[where.classes[j]].split(new RegExp([', ', ' / '].join('|'),'g'));
     line.classes.push(data[where.classes[j]]);
@@ -40,7 +41,7 @@ const putClasses            = (data, where, line) => {
   line.classes = _.without(line.classes, '');
   line.classes = (line.classes.length == 1) ? line.classes[0] : line.classes;
 }
-const putPhones             = (base, data, where, line) => {
+const putPhones               = (base, data, where, line) => {
   for (let j = 0; j < where.phones.length; j++) {
     if(validatePhone(data[where.phones[j]])) {
       let obj = new Object;
@@ -50,8 +51,9 @@ const putPhones             = (base, data, where, line) => {
       line.addresses.push(obj);
     }
   }
+  removeDuplicatedAddress(line.addresses);
 }
-const putEmails             = (base, data, where, line) => {
+const putEmails               = (base, data, where, line) => {
   for (let j = 0; j < where.emails.length; j++) {
     data[where.emails[j]] = data[where.emails[j]].split('/');
     for (let i = 0; i <= data[where.emails[j]].length; i++) {
@@ -63,17 +65,11 @@ const putEmails             = (base, data, where, line) => {
         line.addresses.push(obj);
       }
     }
-    let duplicated = findDuplicatedAddress(line.addresses);
-    if(duplicated.length > 0) {
-      for (let k = duplicated.length-1; k > 0; k--) {
-        line.addresses[duplicated[k-1]].tags = line.addresses[duplicated[k-1]].tags.concat(line.addresses[duplicated[k]].tags);
-        delete line.addresses[duplicated[k]];
-        line.addresses = _.reject(line.addresses, _.isEmpty);
-      }
-    }
+    removeDuplicatedAddress(line.addresses);
+    line.addresses = line.addresses.filter(Boolean);
   }
 }
-const findDuplicatedUser    = (array) => {
+const findDuplicatedUser      = (array) => {
   let duplicated = new Array;
   for (let i = 0; i < array.length; i++)
     for (let j = 0; j < array.length; j++)
@@ -81,7 +77,7 @@ const findDuplicatedUser    = (array) => {
         duplicated.push(i);
   return duplicated;
 }
-const findDuplicatedAddress = (array) => {
+const findDuplicatedAddress   = (array) => {
   let duplicated = new Array;
   for (let i = 0; i < array.length; i++)
     for (let j = 0; j < array.length; j++)
@@ -89,7 +85,16 @@ const findDuplicatedAddress = (array) => {
         duplicated.push(i);
   return duplicated;
 }
-const merge                 = (array) => {
+const removeDuplicatedAddress = (array) => {
+  let duplicated = findDuplicatedAddress(array);
+  if(duplicated.length > 0) {
+    for (let k = duplicated.length-1; k > 0; k--) {
+      array[duplicated[k-1]].tags = array[duplicated[k-1]].tags.concat(array[duplicated[k]].tags);
+      delete array[duplicated[k]];
+    }
+  }
+}
+const merge                   = (array) => {
   let duplicated = findDuplicatedUser(array);
   for (let i = duplicated.length-1; i > 0; i--) {
     array[duplicated[i-1]].classes    = array[duplicated[i-1]].classes.concat(array[duplicated[i]].classes);
@@ -107,11 +112,10 @@ for (let i = 1; i < data.length; i++) {
   let line = base();
   putBasics(data[i], where, line);
   putClasses(data[i], where, line);
-  putEmails(data[0], data[i], where, line);
-  putPhones(data[0], data[i], where, line);
+  putEmails(header, data[i], where, line);
+  putPhones(header, data[i], where, line);
   final.push(line);
 }
-
 fs.writeFile('./files/output.json', JSON.stringify(merge(final), null, 2), function(err) {
   if(err) console.log(err);
   else console.log("JSON saved into ./files/output.json");
