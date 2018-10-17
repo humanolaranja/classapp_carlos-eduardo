@@ -53,12 +53,15 @@ const putPhones = (base, data, where, line) => {
 }
 const putEmails = (base, data, where, line) => {
   for (let j = 0; j < where.emails.length; j++) {
-    if(validateEmail(data[where.emails[j]])) {
-      let obj = new Object;
-      obj.type = 'email';
-      obj.tags = base[where.emails[j]].toString().replace('email ', '').split(new RegExp([', ', ','].join('|'),'g'));
-      obj.address = data[where.emails[j]];
-      line.addresses.push(obj);
+    data[where.emails[j]] = data[where.emails[j]].split('/');
+    for (let i = 0; i <= data[where.emails[j]].length; i++) {
+      if(validateEmail(data[where.emails[j]][i])) {
+        let obj = new Object;
+        obj.type = 'email';
+        obj.tags = base[where.emails[j]].toString().replace('email ', '').split(new RegExp([', ', ','].join('|'),'g'));
+        obj.address = data[where.emails[j]][i];
+        line.addresses.push(obj);
+      }
     }
   }
 }
