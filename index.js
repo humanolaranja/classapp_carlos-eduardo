@@ -8,23 +8,13 @@ var   data      = fs.readFileSync(input, 'utf8');
       data      = Papa.parse(data).data;
 const header    = data[0];
 const indices                 = (array, search) => { return array.map((e, i) => e.includes(search) ? i : '').filter(String) }
-const where                   = {
-  fullname:   indices(header, 'fullname'),
-  eid:        indices(header, 'eid'),
-  classes:    indices(header, 'class'),
-  emails:     indices(header, 'email'),
-  phones:     indices(header, 'phone'),
-  invisible:  indices(header, 'invisible'),
-  see_all:    indices(header, 'see_all')
-}
+const where                   = { fullname :indices(header, 'fullname'), eid :indices(header, 'eid'), classes :indices(header, 'class'), emails :indices(header, 'email'), phones :indices(header, 'phone'), invisible :indices(header, 'invisible'), see_all :indices(header, 'see_all') }
 const base                    = () =>  { return {fullname:'', eid:'', classes:[], addresses:[], invisible:'', see_all:'' } }
 const validateEmail           = (email) => { return /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(email) }
 const validatePhone           = (number) => {
   try { number = phoneUtil.parse(number, 'BR') }
   catch(err) { return false }
-  if(phoneUtil.isValidNumberForRegion(number, 'BR'))
-    return phoneUtil.format(number, PNF.E164).slice(1); // format the number
-  return false;
+  return (phoneUtil.isValidNumberForRegion(number, 'BR')) ? phoneUtil.format(number, PNF.E164).slice(1) : false;
 }
 const putBasics               = (data, where, line) => {
   line.fullname   = data[where.fullname];
@@ -33,10 +23,8 @@ const putBasics               = (data, where, line) => {
   line.see_all    = (data[where.see_all] == '' || data[where.see_all] == 0 || data[where.see_all] == 'no') ? false : (!!data[where.see_all]);;
 }
 const putClasses              = (data, where, line) => {
-  for (let j = 0; j < where.classes.length; j++) {
-    data[where.classes[j]] = data[where.classes[j]].split(new RegExp([', ', ' / '].join('|'),'g'));
-    line.classes.push(data[where.classes[j]]);
-  }
+  for (let j = 0; j < where.classes.length; j++)
+    line.classes.push(data[where.classes[j]].split(new RegExp([', ', ' / '].join('|'),'g')));
   line.classes = _.flattenDeep(line.classes);
   line.classes = _.without(line.classes, '');
   line.classes = (line.classes.length == 1) ? line.classes[0] : line.classes;
@@ -54,8 +42,7 @@ const putAddresses            = (base, data, where, line, type) => {
         line.addresses.push(obj);
       }
     }
-    removeDuplicatedAddress(line.addresses);
-    line.addresses = line.addresses.filter(Boolean);
+    line.addresses = removeDuplicatedAddress(line.addresses);
   }
 }
 const findDuplicatedUser      = (array) => {
@@ -82,6 +69,7 @@ const removeDuplicatedAddress = (array) => {
       delete array[duplicated[k]];
     }
   }
+  return array.filter(Boolean);
 }
 const merge                   = (array) => {
   let duplicated = findDuplicatedUser(array);
@@ -91,7 +79,7 @@ const merge                   = (array) => {
     array[duplicated[i-1]].invisible  = (array[duplicated[i]].invisible != 0) ? array[duplicated[i]].invisible : array[duplicated[i-1]].invisible;
     array[duplicated[i-1]].addresses  = array[duplicated[i-1]].addresses.concat(array[duplicated[i]].addresses);
     delete array[duplicated[i]];
-    array = _.reject(array, _.isEmpty);
+    array = array.filter(Boolean);
   }
   return array;
 }
