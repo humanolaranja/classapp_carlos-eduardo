@@ -41,27 +41,16 @@ const putClasses              = (data, where, line) => {
   line.classes = _.without(line.classes, '');
   line.classes = (line.classes.length == 1) ? line.classes[0] : line.classes;
 }
-const putPhones               = (base, data, where, line) => {
-  for (let j = 0; j < where.phones.length; j++) {
-    if(validatePhone(data[where.phones[j]])) {
-      let obj = new Object;
-      obj.type = 'phone';
-      obj.tags = base[where.phones[j]].toString().replace('phone ', '').split(new RegExp([', ', ','].join('|'),'g'));
-      obj.address = validatePhone(data[where.phones[j]]);
-      line.addresses.push(obj);
-    }
-  }
-  removeDuplicatedAddress(line.addresses);
-}
-const putEmails               = (base, data, where, line) => {
-  for (let j = 0; j < where.emails.length; j++) {
-    data[where.emails[j]] = data[where.emails[j]].split('/');
-    for (let i = 0; i <= data[where.emails[j]].length; i++) {
-      if(validateEmail(data[where.emails[j]][i])) {
+const putAddresses            = (base, data, where, line, type) => {
+  for (let j = 0; j < where.length; j++) {
+    data[where[j]] = data[where[j]].split('/');
+    for (let i = 0; i <= data[where[j]].length; i++) {
+    let validation = (type == 'email') ? validateEmail(data[where[j]][i]) : validatePhone(data[where[j]][i]);
+      if(validation) {
         let obj = new Object;
-        obj.type = 'email';
-        obj.tags = base[where.emails[j]].toString().replace('email ', '').split(new RegExp([', ', ','].join('|'),'g'));
-        obj.address = data[where.emails[j]][i];
+        obj.type = type;
+        obj.tags = base[where[j]].toString().replace(`${type} `, '').split(new RegExp([', ', ','].join('|'),'g'));
+        obj.address = (type == 'email') ? data[where[j]][i] : validation;
         line.addresses.push(obj);
       }
     }
@@ -112,8 +101,8 @@ for (let i = 1; i < data.length; i++) {
   let line = base();
   putBasics(data[i], where, line);
   putClasses(data[i], where, line);
-  putEmails(header, data[i], where, line);
-  putPhones(header, data[i], where, line);
+  putAddresses(header, data[i], where.emails, line, 'email');
+  putAddresses(header, data[i], where.phones, line, 'phone');
   final.push(line);
 }
 fs.writeFile('./files/output.json', JSON.stringify(merge(final), null, 2), function(err) {
