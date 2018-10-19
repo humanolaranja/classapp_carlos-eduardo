@@ -93,7 +93,7 @@ for (let i = 1; i < data.length; i++) {
   putAddresses(header, data[i], where.phones, line, 'phone');
   final.push(line);
 }
-fs.writeFile('./files/output.json', JSON.stringify(merge(final), null, 2), function(err) {
+fs.writeFile('./files/output.json', JSON.stringify(merge(final), null, 2), (err) => {
   if(err) console.log(err);
   else console.log("JSON saved into ./files/output.json");
 });
